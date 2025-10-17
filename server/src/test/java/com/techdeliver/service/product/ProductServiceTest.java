@@ -43,7 +43,7 @@ class ProductServiceTest {
 
         when(productRepository.findById(testId)).thenReturn(Optional.of(testProduct));
 
-        ProductEntity result = productService.getApplianceById(testId);
+        ProductEntity result = productService.getProductById(testId);
 
         assertThat(result).isEqualTo(testProduct);
         verify(productRepository).findById(testId);
@@ -54,7 +54,7 @@ class ProductServiceTest {
 
         when(productRepository.findById(testId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productService.getApplianceById(testId))
+        assertThatThrownBy(() -> productService.getProductById(testId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Appliance with id")
                 .hasMessageContaining(testId.toString())

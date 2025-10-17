@@ -1,15 +1,20 @@
 package com.techdeliver.service.product;
 
 
+import com.techdeliver.dto.ImageDto;
+import com.techdeliver.dto.ProductDto;
+import com.techdeliver.entity.ImageEntity;
 import com.techdeliver.entity.ProductCategoryEntity;
 import com.techdeliver.entity.ProductEntity;
 import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.ResourceNotFoundException;
+import com.techdeliver.repository.ImageRepository;
 import com.techdeliver.repository.ProductRepository;
 import com.techdeliver.request.AddProductRequest;
 import com.techdeliver.request.UpdateProductRequest;
 import com.techdeliver.service.category.IProductCategoryService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,33 +28,37 @@ public class ProductService implements IProductService {
 
     private final IProductCategoryService categoryService;
 
+    private final ImageRepository imageRepository;
+
+    private final ModelMapper modelMapper;
+
 
     @Override
-    public ProductEntity getApplianceById(UUID id) {
+    public ProductEntity getProductById(UUID id) {
         return  productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Appliance with id " + id + " not found"));
     }
 
     @Override
-    public ProductEntity getAppliancesByName(String name) { //TODO: add elastic search
+    public ProductEntity getProductsByName(String name) { //TODO: add elastic search
         return productRepository.findByProductName(name)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Appliance with name " + name + " not found"));
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByCategory(ProductCategoryEntity category) {
+    public List<ProductEntity> getProductsByCategory(ProductCategoryEntity category) {
         return productRepository.findAllByProductCategory(category);
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByBrand(String brand) {
+    public List<ProductEntity> getProductsByBrand(String brand) {
        return productRepository.findAllByProductBrand(brand);
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByModel(String model) {
+    public List<ProductEntity> getProductsByModel(String model) {
        return productRepository.findAllByProductModel(model);
     }
 
@@ -108,6 +117,22 @@ public class ProductService implements IProductService {
     @Override
     public void deleteProduct(UUID id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<ProductEntity> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDto convertToDto(ProductEntity product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<ImageEntity> images = imageRepository.findByProductProductId(product.getProductId());
+        List<ImageDto> imageDtos = images.stream()
+                .map(image -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        productDto.setImages(imageDtos);
+        return productDto;
     }
 
 }

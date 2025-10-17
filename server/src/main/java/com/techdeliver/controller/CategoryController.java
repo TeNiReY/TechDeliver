@@ -15,22 +15,22 @@ public class CategoryController {
 
     private final IProductCategoryService categoryService;
 
-    @QueryMapping
-    public CategoryListResponse getAllCategories() {
-        var categories = categoryService.getAllCategories();
-
-        return new CategoryListResponse(
-                categories.stream()
-                .map(CategoryMapper::mapToDto).toList(),
-                "Get all categories success!");
-    }
-
-    @QueryMapping
-    public List<ProductCategoryDto> categories() {
-        var categories = categoryService.getAllCategories();
-        return categories.stream()
-                .map(CategoryMapper::mapToDto).toList();
-    }
+//    @QueryMapping
+//    public CategoryListResponse getAllCategories() {
+//        var categories = categoryService.getAllCategories();
+//
+//        return new CategoryListResponse(
+//                categories.stream()
+//                .map(CategoryMapper::mapToDto).toList(),
+//                "Get all categories success!");
+//    }
+//
+//    @QueryMapping
+//    public List<ProductCategoryDto> categories() {
+//        var categories = categoryService.getAllCategories();
+//        return categories.stream()
+//                .map(CategoryMapper::mapToDto).toList();
+//    }
 
 
 //    @QueryMapping
