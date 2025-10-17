@@ -1,0 +1,36 @@
+package com.techdeliver.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "categories")
+public class ProductCategoryEntity { //TODO: add base delivery price + base installation price
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    private UUID categoryId;
+
+    private String categoryName;
+
+    private String categoryDescription;
+
+//    @JsonIgnore
+    @OneToMany(mappedBy = "productCategory")
+    private List<ProductEntity> appliances;
+
+    public ProductCategoryEntity(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+}
