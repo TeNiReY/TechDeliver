@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: TechDeliver
+  datasource:
+    url: jdbc:h2:mem:c3e2df6a-010c-4e69-8fe1-edf558ba8782
+    driver-class-name: org.h2.Driver
+    username: SA
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+  h2:
+    console:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: true

@@ -8,13 +8,13 @@ import java.util.stream.Collectors;
 
 public class CategoryMapper {
 
-    public static ProductCategoryDto mapToDto(ProductCategoryEntity category) {
-        return new ProductCategoryDto(
-                category.getCategoryId(),
-                category.getCategoryName(),
-                category.getCategoryDescription(),
-                category.getAppliances().stream()
-                        .map(ProductMapper::mapToDto).collect(Collectors.toList()));
-    }
+//    public static ProductCategoryDto mapToDto(ProductCategoryEntity category) {
+//        return new ProductCategoryDto(
+//                category.getCategoryId(),
+//                category.getCategoryName(),
+//                category.getCategoryDescription(),
+//                category.getAppliances().stream()
+//                        .map(ProductMapper::mapToDto).collect(Collectors.toList()));
+//    }
 
 }

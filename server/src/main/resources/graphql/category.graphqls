@@ -28,7 +28,7 @@ type CategoryListResponse {
 
 
 type CategoryDto {
-    categoryId: ID!
+    categoryId: ID
     categoryName: String
     categoryDescription: String
     products: [ProductDto]
