@@ -1,0 +1,60 @@
+
+type Query {
+
+    getProductById(productId: ID!): ProductDto!
+    
+    products: [ProductDto]!
+
+}
+
+type Mutation {
+
+    addProduct(input: AddProductInput!): ProductResponse!
+
+    updateProduct(productId: ID!, input: UpdateProductInput): ProductResponse!
+
+    deleteProduct(productId: ID!): Boolean
+
+}
+
+type ProductResponse {
+    productDto: ProductDto
+    message: String!
+}
+
+type ProductDto {
+    productId: ID!
+    productCategory: CategoryDto # тут проблема будет т.к. друг в друга вложены
+    productName: String
+    price: String
+    inventory: Int
+    productBrand: String
+    productModel: String
+    productWeight: String
+    productWidth: String
+    productLength: String
+    productHeight: String
+    productDescription: String
+
+}
+
+input AddProductInput {
+    name: String!
+    category: CreateCategoryInput!
+    price: String!
+    inventory: Int!
+    brand: String
+    model: String
+    weight: String
+    width: String
+    length: String
+    height: String
+    description: String
+}
+
+
+input UpdateProductInput {
+    price: String
+    inventory: Int
+    description: String
+}
