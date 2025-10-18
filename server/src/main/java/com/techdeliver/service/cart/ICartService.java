@@ -1,5 +1,6 @@
 package com.techdeliver.service.cart;
 
+import com.techdeliver.dto.CartDto;
 import com.techdeliver.entity.CartEntity;
 import com.techdeliver.entity.CartItemEntity;
 
@@ -21,4 +22,7 @@ public interface ICartService {
 
     CartEntity getCartByUserId(UUID userId);
 
+    List<CartDto> getConvertedProducts(List<CartEntity> cart);
+
+    CartDto convertToDto(CartEntity cart);
 }

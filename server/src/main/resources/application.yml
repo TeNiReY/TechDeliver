@@ -26,3 +26,8 @@ spring:
       allowed-methods: "*"
       allowed-headers: "*"
       allow-credentials: true
+
+auth:
+  token:
+    jwtSecret: 367639792442264529484840635166546457605A7134743777217A2543244620
+    expirationInMils: 3600000
