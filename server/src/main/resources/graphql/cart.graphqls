@@ -1,7 +1,7 @@
 
 extend type Query {
 
-    getCartItems(userId: ID!): CartDto!
+    getCart(userId: ID!): CartDto!
 
 }
 
@@ -20,7 +20,7 @@ type CartDto {
     cartId: String
     userId: String
     totalPrice: Float
-    cartItems: [CartDto]
+    cartItems: [CartItemDto]
 }
 
 type CartItemDto {
