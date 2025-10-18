@@ -48,7 +48,7 @@ input AddProductInput {
     name: String!
     categoryNameOrId: String!
     price: String!
-    inventory: Int!
+    quantity: Int!
     brand: String
     model: String
     weight: String
