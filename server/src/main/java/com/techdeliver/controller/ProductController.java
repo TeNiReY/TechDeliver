@@ -13,6 +13,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -21,12 +22,17 @@ import java.util.UUID;
 public class ProductController {
 
     private final IProductService productService;
-    private final ServletConfig servletConfig;
 
     @QueryMapping
     public ProductDto getProductById(@Argument UUID productId) {
         var product =  productService.getProductById(productId);
         return productService.convertToDto(product);
+    }
+
+    @QueryMapping
+    public List<ProductDto> getProductsByCategory(@Argument UUID categoryId) {
+        var products = productService.getProductsByCategoryId(categoryId);
+        return productService.getConvertedProducts(products);
     }
 
     @MutationMapping

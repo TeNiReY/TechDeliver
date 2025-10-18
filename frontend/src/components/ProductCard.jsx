@@ -1,10 +1,12 @@
 const ProductCard = ({ product }) => {
   const formatPrice = (price) => {
+    // Преобразуем строку в число, если это необходимо
+    const numericPrice = typeof price === 'string' ? parseFloat(price) : price
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB',
       minimumFractionDigits: 0,
-    }).format(price)
+    }).format(numericPrice)
   }
 
   const isInStock = product.inventory > 0
@@ -24,7 +26,7 @@ const ProductCard = ({ product }) => {
         )}
         {isInStock && product.inventory < 5 && (
           <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-            Мало в наличии
+            Скоро закончится
           </div>
         )}
       </div>
@@ -32,17 +34,17 @@ const ProductCard = ({ product }) => {
       <div className="p-5 sm:p-6">
         <div className="mb-2">
           <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-            {product.productCategory.categoryName}
+            {product.productCategory?.categoryName || 'Без категории'}
           </span>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-          {product.productBrand} {product.productModel}
-        </h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+              {product.productName}
+          </h3>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {product.productDescription || product.productName}
-        </p>
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {product.productDescription || `${product.productBrand} ${product.productModel}`}
+          </p>
 
         <div className="flex items-center justify-between mb-4">
           <div>

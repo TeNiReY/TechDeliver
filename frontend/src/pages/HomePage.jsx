@@ -1,71 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@apollo/client'
 import CategoryCard from '../components/CategoryCard'
 import ProductCard from '../components/ProductCard'
 import Hero from '../components/Hero'
-
-const mockCategories = [
-  { categoryId: '1', categoryName: 'Холодильники', categoryDescription: 'Надежные и экономичные модели' },
-  { categoryId: '2', categoryName: 'Стиральные машины', categoryDescription: 'Фронтальные и вертикальные' },
-  { categoryId: '3', categoryName: 'Телевизоры', categoryDescription: '4K, Smart TV, OLED, QLED' },
-  { categoryId: '4', categoryName: 'Микроволновки', categoryDescription: 'Компактные и мощные' },
-]
-
-const mockProducts = [
-  {
-    productId: 'p1',
-    productName: 'Холодильник Samsung RB30',
-    price: 49990,
-    inventory: 8,
-    productBrand: 'Samsung',
-    productModel: 'RB30',
-    productDescription: 'Двухкамерный, No Frost, класс A+',
-    productCategory: { categoryName: 'Холодильники' },
-  },
-  {
-    productId: 'p2',
-    productName: 'Стиральная машина LG F2',
-    price: 37990,
-    inventory: 2,
-    productBrand: 'LG',
-    productModel: 'F2',
-    productDescription: 'Паровая стирка, 1200 об/мин',
-    productCategory: { categoryName: 'Стиральные машины' },
-  },
-  {
-    productId: 'p3',
-    productName: 'Телевизор Sony X90',
-    price: 89990,
-    inventory: 0,
-    productBrand: 'Sony',
-    productModel: 'X90',
-    productDescription: '55\", 4K, HDR, 120 Гц',
-    productCategory: { categoryName: 'Телевизоры' },
-  },
-  {
-    productId: 'p4',
-    productName: 'Микроволновая печь Panasonic NN',
-    price: 12990,
-    inventory: 14,
-    productBrand: 'Panasonic',
-    productModel: 'NN',
-    productDescription: 'Гриль, авто-режимы, 1000 Вт',
-    productCategory: { categoryName: 'Микроволновки' },
-  },
-]
+import { GET_ALL_CATEGORIES } from '../graphql/queries'
 
 const HomePage = () => {
-  const [categories, setCategories] = useState([])
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { data, loading, error } = useQuery(GET_ALL_CATEGORIES)
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCategories(mockCategories)
-      setProducts(mockProducts)
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
-  }, [])
+  // Получаем категории из GraphQL ответа
+  const categories = data?.getAllCategories?.categories || []
+  
+  // Получаем все продукты из всех категорий для секции "Популярные товары"
+  const allProducts = categories.flatMap(category => category.products || [])
 
   return (
     <div className="min-h-screen">
@@ -83,11 +29,30 @@ const HomePage = () => {
           </div>
         )}
 
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {categories.map((category) => (
-              <CategoryCard key={category.categoryId} category={category} />
-            ))}
+        {error && (
+          <div className="flex justify-center items-center py-10">
+            <div className="text-red-600 text-center">
+              <p className="text-lg font-semibold mb-2">Ошибка загрузки категорий</p>
+              <p className="text-sm">{error.message}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && categories.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              {categories.map((category) => (
+                <CategoryCard key={category.categoryId} category={category} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && categories.length === 0 && (
+          <div className="flex justify-center items-center py-10">
+            <div className="text-gray-600 text-center">
+              <p className="text-lg">Категории не найдены</p>
+            </div>
           </div>
         )}
       </section>
@@ -104,11 +69,30 @@ const HomePage = () => {
           </div>
         )}
 
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {products.slice(0, 8).map((product) => (
-              <ProductCard key={product.productId} product={product} />
-            ))}
+        {error && (
+          <div className="flex justify-center items-center py-10">
+            <div className="text-red-600 text-center">
+              <p className="text-lg font-semibold mb-2">Ошибка загрузки товаров</p>
+              <p className="text-sm">{error.message}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && allProducts.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              {allProducts.slice(0, 8).map((product) => (
+                <ProductCard key={product.productId} product={product} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && allProducts.length === 0 && (
+          <div className="flex justify-center items-center py-10">
+            <div className="text-gray-600 text-center">
+              <p className="text-lg">Товары не найдены</p>
+            </div>
           </div>
         )}
       </section>

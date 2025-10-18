@@ -16,7 +16,7 @@ public interface IProductService {
 
     ProductEntity getProductsByName(String name);
 
-    List<ProductEntity> getProductsByCategory(ProductCategoryEntity category);
+    List<ProductEntity> getProductsByCategoryId(UUID categoryId);
 
     List<ProductEntity> getProductsByBrand(String brand);
 
