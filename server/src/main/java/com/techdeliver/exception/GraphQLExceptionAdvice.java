@@ -42,4 +42,12 @@ public class GraphQLExceptionAdvice {
                 .build();
     }
 
+    @GraphQlExceptionHandler
+    public GraphQLError handleException(InvalidCredentialsException ex) {
+        return GraphqlErrorBuilder.newError()
+                .message(ex.getMessage())
+                .errorType(ErrorType.BAD_REQUEST)
+                .build();
+    }
+
 }
