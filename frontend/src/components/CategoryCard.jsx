@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom'
-
-const CategoryCard = ({ category }) => {
+const CategoryCard = ({ category, onClick }) => {
   const getCategoryIcon = (categoryName) => {
     const name = categoryName.toLowerCase()
     
@@ -28,19 +26,20 @@ const CategoryCard = ({ category }) => {
   }
 
   return (
-    <Link to={`/category/${category.categoryId}`}>
-      <div className="category-card bg-white rounded-xl shadow-md p-6 cursor-pointer border-2 border-transparent hover:border-purple-500">
-        <div className="flex flex-col items-center text-center">
-          <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-full mb-4">
-            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {getCategoryIcon(category.categoryName)}
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.categoryName}</h3>
-          <p className="text-gray-600 text-sm">{category.categoryDescription}</p>
+    <div 
+      className="category-card bg-white rounded-xl shadow-md p-6 cursor-pointer border-2 border-transparent hover:border-purple-500"
+      onClick={onClick}
+    >
+      <div className="flex flex-col items-center text-center">
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-full mb-4">
+          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {getCategoryIcon(category.categoryName)}
+          </svg>
         </div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.categoryName}</h3>
+        <p className="text-gray-600 text-sm">{category.categoryDescription}</p>
       </div>
-    </Link>
+    </div>
   )
 }
 
