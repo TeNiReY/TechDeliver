@@ -40,7 +40,7 @@ class ProductCategoryServiceTest {
     @Test
     void createCategory_shouldReturnCategory() {
 
-        ProductCategoryEntity result = service.createCategory("Test Category");
+        ProductCategoryEntity result = service.addCategory("Test Category");
 
         assertThat(result).isNotNull();
         assertThat(result.getCategoryName()).isEqualTo("Test Category");

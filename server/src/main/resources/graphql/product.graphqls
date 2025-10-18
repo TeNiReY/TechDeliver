@@ -1,9 +1,9 @@
 
 type Query {
 
-    getProductById(productId: ID!): ProductDto!
+    getProductById(productId: ID!): ProductDto
     
-    products: [ProductDto]!
+    getProductsByCategory(categoryId: ID!): [ProductDto]
 
 }
 
@@ -23,7 +23,7 @@ type ProductResponse {
 }
 
 type ProductDto {
-    productId: ID!
+    productId: ID
     productCategory: CategoryDto # тут проблема будет т.к. друг в друга вложены
     productName: String
     price: String
@@ -35,14 +35,20 @@ type ProductDto {
     productLength: String
     productHeight: String
     productDescription: String
+    images: [ImageDto]
+}
 
+type ImageDto {
+    id: String
+    fileName: String
+    downloadUrl: String
 }
 
 input AddProductInput {
     name: String!
-    category: CreateCategoryInput!
+    categoryNameOrId: String!
     price: String!
-    inventory: Int!
+    quantity: Int!
     brand: String
     model: String
     weight: String

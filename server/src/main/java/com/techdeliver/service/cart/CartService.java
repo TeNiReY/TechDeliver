@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -44,7 +43,7 @@ public class CartService implements ICartService {
     public void addItemToCart(UUID userId, UUID productId, int quantity) {
 
         var cart = getCartById(userId); //TODO: change
-        var product = productService.getApplianceById(productId);
+        var product = productService.getProductById(productId);
 
         var cartItem = cart.getCartItems()
                 .stream()

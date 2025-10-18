@@ -1,55 +1,68 @@
 package com.techdeliver.service.product;
 
 
+import com.techdeliver.dto.ImageDto;
+import com.techdeliver.dto.ProductDto;
+import com.techdeliver.entity.ImageEntity;
 import com.techdeliver.entity.ProductCategoryEntity;
 import com.techdeliver.entity.ProductEntity;
 import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.ResourceNotFoundException;
+import com.techdeliver.repository.ImageRepository;
+import com.techdeliver.repository.ProductCategoryRepository;
 import com.techdeliver.repository.ProductRepository;
 import com.techdeliver.request.AddProductRequest;
 import com.techdeliver.request.UpdateProductRequest;
 import com.techdeliver.service.category.IProductCategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
+    private final ProductCategoryRepository categoryRepository;
 
     private final IProductCategoryService categoryService;
 
+    private final ImageRepository imageRepository;
+
+    private final ModelMapper modelMapper;
+
 
     @Override
-    public ProductEntity getApplianceById(UUID id) {
+    public ProductEntity getProductById(UUID id) {
         return  productRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Appliance with id " + id + " not found"));
     }
 
     @Override
-    public ProductEntity getAppliancesByName(String name) { //TODO: add elastic search
+    public ProductEntity getProductsByName(String name) { //TODO: add elastic search
         return productRepository.findByProductName(name)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Appliance with name " + name + " not found"));
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByCategory(ProductCategoryEntity category) {
-        return productRepository.findAllByProductCategory(category);
+    public List<ProductEntity> getProductsByCategoryId(UUID categoryId) {
+        return productRepository.findAllByProductCategory_CategoryId(categoryId);
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByBrand(String brand) {
+    public List<ProductEntity> getProductsByBrand(String brand) {
        return productRepository.findAllByProductBrand(brand);
     }
 
     @Override
-    public List<ProductEntity> getAppliancesByModel(String model) {
+    public List<ProductEntity> getProductsByModel(String model) {
        return productRepository.findAllByProductModel(model);
     }
 
@@ -60,19 +73,27 @@ public class ProductService implements IProductService {
             throw new AlreadyExistsException("Product with name " + request.getName() + " already exists. You should update product instead of add.");
         }
 
-        ProductCategoryEntity category = categoryService
-                .getCategoryByName(request.getCategory().getCategoryName())
-                .orElseGet(() ->
-                        categoryService.createCategory(
-                                request.getCategory().getCategoryName()));
+        log.info("Category name: {}", request.getCategoryNameOrId());
 
-        request.setCategory(category);
-        return productRepository.save(createAppliance(request));
+//        ProductCategoryEntity category = categoryRepository
+//                .findByCategoryNameOrCategoryId(request.getCategoryNameOrId(), UUID.fromString(request.getCategoryNameOrId()))
+//                .orElseGet(() ->
+//                        categoryService.addCategory(
+//                                request.getCategoryNameOrId())); //TODO: change this bc if category not found and we send id - category will create with name of id
+
+        ProductCategoryEntity category = categoryService
+                .getCategoryByName(request.getCategoryNameOrId())
+                .orElseGet(() ->
+                        categoryService.addCategory(
+                                request.getCategoryNameOrId()));
+
+
+        return productRepository.save(createAppliance(category, request));
     }
 
-    private ProductEntity createAppliance(AddProductRequest request) {
+    private ProductEntity createAppliance(ProductCategoryEntity category, AddProductRequest request) {
         return new ProductEntity(
-                request.getCategory(),
+                category,
                 request.getName(),
                 request.getPrice(),
                 request.getQuantity(),
@@ -108,6 +129,22 @@ public class ProductService implements IProductService {
     @Override
     public void deleteProduct(UUID id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<ProductEntity> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDto convertToDto(ProductEntity product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<ImageEntity> images = imageRepository.findByProductProductId(product.getProductId());
+        List<ImageDto> imageDtos = images.stream()
+                .map(image -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        productDto.setImages(imageDtos);
+        return productDto;
     }
 
 }
