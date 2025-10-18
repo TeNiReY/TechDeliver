@@ -1,11 +1,14 @@
 
 extend type Query {
 
+
+
+    getCategoryById(categoryId: ID!): CategoryResponse!
+
     getCategoryByName(name: String!): CategoryResponse!
 
     getAllCategories: CategoryListResponse!
-    
-    categories: [CategoryDto]!
+
 
 }
 
