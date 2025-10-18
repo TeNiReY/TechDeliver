@@ -91,3 +91,53 @@ export const REGISTER_MUTATION = gql`
     }
   }
 `;
+
+// User mutations
+export const UPDATE_USERNAME_MUTATION = gql`
+  mutation UpdateUsername($userId: ID!, $newUsername: String!) {
+    updateUsername(userId: $userId, newUsername: $newUsername) {
+      userId
+      username
+      email
+    }
+  }
+`;
+
+export const UPDATE_PASSWORD_MUTATION = gql`
+  mutation UpdateUserPassword($userId: ID!, $oldPass: String!, $newPass: String!) {
+    updateUserPassword(userId: $userId, oldPass: $oldPass, newPass: $newPass) {
+      userId
+      username
+      email
+    }
+  }
+`;
+
+// Cart queries
+export const GET_CART_QUERY = gql`
+  query GetCart($userId: ID!) {
+    getCart(userId: $userId) {
+      cartId
+      userId
+      totalPrice
+      cartItems {
+        cartItemId
+        quantity
+        unitPrice
+        totalPrice
+        product {
+          productId
+          productName
+          price
+          productBrand
+          productModel
+          images {
+            id
+            fileName
+            downloadUrl
+          }
+        }
+      }
+    }
+  }
+`;
