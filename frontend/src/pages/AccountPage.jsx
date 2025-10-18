@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import UpdateUsernameForm from '../components/UpdateUsernameForm'
+import UpdatePasswordForm from '../components/UpdatePasswordForm'
+import CartView from '../components/CartView'
 
 const sections = [
   { id: 'profile', title: 'Профиль' },
+  { id: 'cart', title: 'Корзина' },
   { id: 'orders', title: 'Мои заказы' },
   { id: 'addresses', title: 'Адреса доставки' },
   { id: 'favorites', title: 'Избранное' },
@@ -19,17 +23,36 @@ const AccountPage = () => {
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Профиль</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">ID пользователя</label>
-                <p className="mt-1 text-sm text-gray-900">{user?.userId || 'Не указан'}</p>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ID пользователя</label>
+                  <p className="mt-1 text-sm text-gray-900 font-mono">{user?.userId || 'Не указан'}</p>
+                  {user?.userId && (
+                    <p className="mt-1 text-xs text-gray-500">Тип: {typeof user.userId}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Статус</label>
+                  <p className="mt-1 text-sm text-green-600">Активен</p>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Статус</label>
-                <p className="mt-1 text-sm text-green-600">Активен</p>
+              
+              <div className="border-t pt-6">
+                <UpdateUsernameForm />
               </div>
-              <p className="text-gray-600">Здесь появится редактирование профиля и привязка телефона/email.</p>
+              
+              <div className="border-t pt-6">
+                <UpdatePasswordForm />
+              </div>
             </div>
+          </div>
+        )
+      case 'cart':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Корзина</h2>
+            <CartView />
           </div>
         )
       case 'orders':

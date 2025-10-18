@@ -7,6 +7,7 @@ import ContactPage from './pages/ContactPage'
 import AccountPage from './pages/AccountPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import CartPage from './pages/CartPage'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -31,6 +32,11 @@ function App() {
             } />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/cart" element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
         <Footer />

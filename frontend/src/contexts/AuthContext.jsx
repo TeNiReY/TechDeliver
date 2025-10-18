@@ -15,11 +15,28 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  // Функция для декодирования JWT токена и получения userId
+  const getUserIdFromToken = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.sub; // subject содержит userId
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (token) {
-      // Здесь можно добавить логику для получения информации о пользователе
-      // по токену, если это необходимо
-      setUser({ token });
+      // Получаем userId из localStorage или из токена
+      let userId = localStorage.getItem('userId');
+      if (!userId) {
+        userId = getUserIdFromToken(token);
+        if (userId) {
+          localStorage.setItem('userId', userId);
+        }
+      }
+      setUser({ token, userId });
     }
     setLoading(false);
   }, [token]);
