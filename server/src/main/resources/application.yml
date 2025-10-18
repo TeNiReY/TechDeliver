@@ -20,3 +20,9 @@ spring:
     path: /graphql
     graphiql:
       enabled: true
+  web:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
