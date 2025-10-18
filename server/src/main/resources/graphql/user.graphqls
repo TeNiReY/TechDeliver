@@ -1,0 +1,17 @@
+
+
+extend type Mutation {
+
+    updateUsername(userId: ID!, newUsername: String!): UserDto
+
+    updateUserPassword(userId: ID!, oldPass: String!, newPass: String!): UserDto
+
+}
+
+type UserDto {
+    userId: ID!
+    email: String
+    username: String
+    cart: CartDto
+    roles: [String]
+}
