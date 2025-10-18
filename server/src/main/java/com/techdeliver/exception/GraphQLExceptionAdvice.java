@@ -50,4 +50,12 @@ public class GraphQLExceptionAdvice {
                 .build();
     }
 
+    @GraphQlExceptionHandler
+    public GraphQLError handleException(EmptyCartException ex) {
+        return GraphqlErrorBuilder.newError()
+                .message(ex.getMessage())
+                .errorType(ErrorType.BAD_REQUEST)
+                .build();
+    }
+
 }
