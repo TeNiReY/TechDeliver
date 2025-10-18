@@ -1,16 +1,24 @@
 package com.techdeliver.service.cart;
 
+import com.techdeliver.dto.CartDto;
+import com.techdeliver.dto.CartItemDto;
+import com.techdeliver.dto.ProductDto;
 import com.techdeliver.entity.CartEntity;
 import com.techdeliver.entity.CartItemEntity;
 import com.techdeliver.exception.ResourceNotFoundException;
 import com.techdeliver.repository.CartItemRepository;
 import com.techdeliver.repository.CartRepository;
 import com.techdeliver.service.product.IProductService;
+import com.techdeliver.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +26,9 @@ public class CartService implements ICartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final IProductService productService;
+    private final IUserService userService;
+
+    private final ModelMapper modelMapper;
 
 
     public CartEntity getCartById(UUID id) {
@@ -28,7 +39,11 @@ public class CartService implements ICartService {
 
     @Override
     public CartEntity getCartByUserId(UUID userId) {
-        return cartRepository.findByUserId(userId).orElse(null); //TODO: if no cart we return null
+        return cartRepository.findByUser_UserId(userId).orElseGet(() -> {
+            CartEntity cart = new CartEntity();
+            cart.setUser(userService.getUserById(userId));
+            return cartRepository.save(cart);
+        });
     }
 
     @Override
@@ -105,6 +120,27 @@ public class CartService implements ICartService {
                 .findFirst().orElseThrow(() ->
                         new ResourceNotFoundException("Product with id: " + productId +
                                 " not found in cart with id: " + cartId + " !"));
+    }
+
+    @Override
+    public List<CartDto> getConvertedProducts(List<CartEntity> cart) {
+        return cart.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public CartDto convertToDto(CartEntity cart) {
+        CartDto cartDto = modelMapper.map(cart, CartDto.class);
+
+        Set<CartItemDto> cartItemDtos = cart.getCartItems().stream()
+                .map(item -> {
+                    CartItemDto itemDto = modelMapper.map(item, CartItemDto.class);
+                    itemDto.setProduct(modelMapper.map(item.getProduct(), ProductDto.class));
+                    return itemDto;
+                })
+                .collect(Collectors.toSet());
+
+        cartDto.setCartItems(cartItemDtos);
+        return cartDto;
     }
 
 
