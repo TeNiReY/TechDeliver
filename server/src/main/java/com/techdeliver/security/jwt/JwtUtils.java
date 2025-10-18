@@ -31,8 +31,8 @@ public class JwtUtils {
                 .map(GrantedAuthority:: getAuthority).toList();
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .claim("id", userPrincipal.getId())
+                .setSubject(userPrincipal.getId().toString())
+                .claim("username", userPrincipal.getUsername())
                 .claim("roles", roles) // устанавливаем что мы будем хранить в токене
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + expirationTime))
@@ -44,6 +44,14 @@ public class JwtUtils {
     }
 
     public String getUsernameFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("username", String.class);
+    }
+
+    public String getIdFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
