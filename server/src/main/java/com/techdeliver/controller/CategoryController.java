@@ -2,9 +2,9 @@ package com.techdeliver.controller;
 
 import com.techdeliver.dto.ProductCategoryDto;
 import com.techdeliver.request.AddCategoryRequest;
+import com.techdeliver.security.permission.RequireRole;
 import com.techdeliver.service.category.IProductCategoryService;
 import com.techdeliver.service.category.ProductCategoryService;
-import com.techdeliver.util.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -41,6 +41,7 @@ public class CategoryController {
     }
 
     @MutationMapping
+    @RequireRole("ADMIN")
     public CategoryResponse createCategory(@Argument AddCategoryRequest input) {
 
         var createdCategory = categoryService.createCategory(input);
