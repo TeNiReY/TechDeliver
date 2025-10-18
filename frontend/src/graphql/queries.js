@@ -71,3 +71,23 @@ export const GET_PRODUCTS_BY_CATEGORY = gql`
     }
   }
 `;
+
+// Auth mutations
+export const LOGIN_MUTATION = gql`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
+      token
+      userId
+      message
+    }
+  }
+`;
+
+export const REGISTER_MUTATION = gql`
+  mutation RegisterUserAccount($input: RegisterInput!) {
+    registerUserAccount(input: $input) {
+      result
+      message
+    }
+  }
+`;

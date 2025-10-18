@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ShopUserDetails implements UserDetails {
 
     private UUID id;
+    private String username;
     private String email;
     private String password;
 
@@ -34,6 +35,7 @@ public class ShopUserDetails implements UserDetails {
 
         return new ShopUserDetails(
                 user.getUserId(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
                 authorities);
@@ -51,7 +53,7 @@ public class ShopUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

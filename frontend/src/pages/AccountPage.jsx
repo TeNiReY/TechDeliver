@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 
 const sections = [
   { id: 'profile', title: 'Профиль' },
@@ -10,6 +11,7 @@ const sections = [
 
 const AccountPage = () => {
   const [active, setActive] = useState('profile')
+  const { user, logout } = useAuth()
 
   const renderContent = () => {
     switch (active) {
@@ -17,7 +19,17 @@ const AccountPage = () => {
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Профиль</h2>
-            <p className="text-gray-600">Здесь появится редактирование профиля и привязка телефона/email.</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">ID пользователя</label>
+                <p className="mt-1 text-sm text-gray-900">{user?.userId || 'Не указан'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Статус</label>
+                <p className="mt-1 text-sm text-green-600">Активен</p>
+              </div>
+              <p className="text-gray-600">Здесь появится редактирование профиля и привязка телефона/email.</p>
+            </div>
           </div>
         )
       case 'orders':
@@ -45,8 +57,17 @@ const AccountPage = () => {
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Безопасность</h2>
-            <p className="text-gray-600 mb-4">В будущем: вход/выход, смена пароля, JWT, 2FA.</p>
-            <button className="px-5 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white">Войти</button>
+            <div className="space-y-4">
+              <p className="text-gray-600">Управление безопасностью аккаунта.</p>
+              <div className="border-t pt-4">
+                <button 
+                  onClick={logout}
+                  className="px-5 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
+                >
+                  Выйти из аккаунта
+                </button>
+              </div>
+            </div>
           </div>
         )
       default:

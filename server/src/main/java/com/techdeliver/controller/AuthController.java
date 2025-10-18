@@ -24,7 +24,7 @@ public class AuthController {
     @MutationMapping
     public AuthResponse login(@Argument LoginRequest input)  {
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(input.getUsername(), input.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             String jwt = jwtUtils.generateTokenForUser(authentication);
