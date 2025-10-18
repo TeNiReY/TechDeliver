@@ -3,7 +3,7 @@ type Query {
 
     getProductById(productId: ID!): ProductDto
     
-    products: [ProductDto]!
+    getProductsByCategory(categoryId: ID!): [ProductDto]
 
 }
 
@@ -46,9 +46,9 @@ type ImageDto {
 
 input AddProductInput {
     name: String!
-    category: CreateCategoryInput!
+    categoryNameOrId: String!
     price: String!
-    inventory: Int!
+    quantity: Int!
     brand: String
     model: String
     weight: String

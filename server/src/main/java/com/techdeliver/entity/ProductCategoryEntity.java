@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,10 +28,16 @@ public class ProductCategoryEntity { //TODO: add base delivery price + base inst
 
 //    @JsonIgnore
     @OneToMany(mappedBy = "productCategory")
-    private List<ProductEntity> appliances;
+    private List<ProductEntity> products;
 
     public ProductCategoryEntity(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public ProductCategoryEntity(String categoryName, String categoryDescription) {
+        this.categoryName = categoryName;
+        this.categoryDescription = categoryDescription;
+        products =  new ArrayList<>();
     }
 
 }

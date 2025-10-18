@@ -9,22 +9,26 @@ import com.techdeliver.entity.ProductEntity;
 import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.ResourceNotFoundException;
 import com.techdeliver.repository.ImageRepository;
+import com.techdeliver.repository.ProductCategoryRepository;
 import com.techdeliver.repository.ProductRepository;
 import com.techdeliver.request.AddProductRequest;
 import com.techdeliver.request.UpdateProductRequest;
 import com.techdeliver.service.category.IProductCategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
+    private final ProductCategoryRepository categoryRepository;
 
     private final IProductCategoryService categoryService;
 
@@ -48,8 +52,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public List<ProductEntity> getProductsByCategory(ProductCategoryEntity category) {
-        return productRepository.findAllByProductCategory(category);
+    public List<ProductEntity> getProductsByCategoryId(UUID categoryId) {
+        return productRepository.findAllByProductCategory_CategoryId(categoryId);
     }
 
     @Override
@@ -69,19 +73,27 @@ public class ProductService implements IProductService {
             throw new AlreadyExistsException("Product with name " + request.getName() + " already exists. You should update product instead of add.");
         }
 
-        ProductCategoryEntity category = categoryService
-                .getCategoryByName(request.getCategory().getCategoryName())
-                .orElseGet(() ->
-                        categoryService.createCategory(
-                                request.getCategory().getCategoryName()));
+        log.info("Category name: {}", request.getCategoryNameOrId());
 
-        request.setCategory(category);
-        return productRepository.save(createAppliance(request));
+//        ProductCategoryEntity category = categoryRepository
+//                .findByCategoryNameOrCategoryId(request.getCategoryNameOrId(), UUID.fromString(request.getCategoryNameOrId()))
+//                .orElseGet(() ->
+//                        categoryService.addCategory(
+//                                request.getCategoryNameOrId())); //TODO: change this bc if category not found and we send id - category will create with name of id
+
+        ProductCategoryEntity category = categoryService
+                .getCategoryByName(request.getCategoryNameOrId())
+                .orElseGet(() ->
+                        categoryService.addCategory(
+                                request.getCategoryNameOrId()));
+
+
+        return productRepository.save(createAppliance(category, request));
     }
 
-    private ProductEntity createAppliance(AddProductRequest request) {
+    private ProductEntity createAppliance(ProductCategoryEntity category, AddProductRequest request) {
         return new ProductEntity(
-                request.getCategory(),
+                category,
                 request.getName(),
                 request.getPrice(),
                 request.getQuantity(),
