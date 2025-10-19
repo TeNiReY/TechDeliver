@@ -15,6 +15,6 @@ public class UserDto {
     private UUID userId;
     private String email;
     private String username;
-    private CartEntity cart;
+//    private CartEntity cart;
 //    private Collection<RoleEntity> roles; // need or not?
 }
