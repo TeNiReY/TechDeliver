@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import UpdateUsernameForm from '../components/UpdateUsernameForm'
 import UpdatePasswordForm from '../components/UpdatePasswordForm'
 import CartView from '../components/CartView'
+import OrdersView from '../components/OrdersView'
 
 const sections = [
   { id: 'profile', title: 'Профиль' },
@@ -16,6 +18,14 @@ const sections = [
 const AccountPage = () => {
   const [active, setActive] = useState('profile')
   const { user, logout } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && sections.some(section => section.id === tab)) {
+      setActive(tab)
+    }
+  }, [searchParams])
 
   const renderContent = () => {
     switch (active) {
@@ -56,12 +66,7 @@ const AccountPage = () => {
           </div>
         )
       case 'orders':
-        return (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Мои заказы</h2>
-            <div className="rounded-lg border border-gray-200 p-6 text-gray-600">Пока заказов нет.</div>
-          </div>
-        )
+        return <OrdersView />
       case 'addresses':
         return (
           <div>
