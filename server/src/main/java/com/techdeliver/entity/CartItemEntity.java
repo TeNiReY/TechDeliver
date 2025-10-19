@@ -11,10 +11,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "cart_items")
-public class CartItemEntity { //TODO: придумать что то с ценой доставки + установки
+public class CartItemEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID cartItemId;
 
     private int quantity;
@@ -23,10 +23,10 @@ public class CartItemEntity { //TODO: придумать что то с цено
 
     private BigDecimal totalPrice;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private ProductEntity product;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private CartEntity cart;
 
     public void setTotalPrice() {
@@ -40,5 +40,4 @@ public class CartItemEntity { //TODO: придумать что то с цено
     public void reduceQuantity(int quantity) {
         this.quantity -= quantity;
     }
-
 }
