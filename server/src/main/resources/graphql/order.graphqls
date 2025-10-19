@@ -1,0 +1,32 @@
+
+extend type Query {
+
+    getUserOrders(userId: ID!): [OrderDto]
+
+}
+
+extend type Mutation {
+
+    placeOrder(userId: ID!): OrderDto
+
+
+
+}
+
+type OrderDto {
+    id: String
+    userId: String
+    orderDate: String # TODO: i think here will be problem
+    totalAmount: Float
+    status: String
+    orderItems: [OrderItemDto]
+}
+
+type OrderItemDto {
+    productId: String
+    productName: String
+    productBrand: String
+    quantity: Int
+    price: Float
+}
+
