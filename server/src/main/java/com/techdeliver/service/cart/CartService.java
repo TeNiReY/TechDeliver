@@ -13,6 +13,7 @@ import com.techdeliver.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -46,18 +47,19 @@ public class CartService implements ICartService {
         });
     }
 
+    @Transactional
     @Override
-    public void clearCart(UUID userId) { //TODO: make for user
-        CartEntity cart = getCartById(userId);
+    public void clearCart(UUID userId) {
+        CartEntity cart = getCartByUserId(userId);
         cartItemRepository.deleteAllByCart_CartId(cart.getCartId());
-        cart.getCartItems().clear();
-        cartRepository.deleteById(cart.getCartId());
+        cart.clearCart();
+        cartRepository.save(cart); //TODO: maybe i should return cart
     }
 
     @Override
     public void addItemToCart(UUID userId, UUID productId, int quantity) {
 
-        var cart = getCartById(userId); //TODO: change
+        var cart = getCartByUserId(userId);
         var product = productService.getProductById(productId);
 
         var cartItem = cart.getCartItems()
@@ -82,16 +84,16 @@ public class CartService implements ICartService {
 
     @Override
     public void removeItemFromCart(UUID userId, UUID productId) {
-        var cart = getCartById(userId);
+        var cart = getCartByUserId(userId);
         var itemToRemove = getCartItem(userId, productId);
         cart.removeItem(itemToRemove);
-        cartItemRepository.delete(itemToRemove); //TODO: проверить надо ли это удаление?
+        cartItemRepository.deleteById(itemToRemove.getCartItemId());
         cartRepository.save(cart);
     }
 
     @Override
     public void updateItemQuantity(UUID userId, UUID productId, int quantity) {
-        var cart = getCartById(userId);
+        var cart = getCartByUserId(userId);
 
         cart.getCartItems()
                 .stream()
@@ -107,13 +109,13 @@ public class CartService implements ICartService {
                 .map(CartItemEntity::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        cart.setTotalPrice(totalPrice);// TODO: проверить обновляется ли то что я добавил (именно cartItem)
+        cart.setTotalPrice(totalPrice);
         cartRepository.save(cart);
     }
 
     @Override
     public CartItemEntity getCartItem(UUID cartId, UUID productId) {
-        var cart =  getCartById(cartId);
+        var cart =  getCartByUserId(cartId);
         return cart.getCartItems()
                 .stream()
                 .filter(item -> item.getProduct().getProductId().equals(productId))
