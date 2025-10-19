@@ -53,7 +53,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         // Публичные endpoints
-                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/graphql").permitAll()  // GraphQL доступен всем
 
                         // Всё остальное требует аутентификацию
