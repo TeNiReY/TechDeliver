@@ -7,11 +7,11 @@ extend type Query {
 
 extend type Mutation {
 
-    addItemToCart(userId: ID!, productId: ID!, quantity: Int!): CartResult!
+    addItemToCart(userId: ID!, productId: ID!, quantity: Int!): CartResponse!
 
-    removeItemFromCart(userId: ID!, productId: ID!): CartResult!
+    removeItemFromCart(userId: ID!, productId: ID!): CartResponse!
 
-
+    updateItemQuantity(userId: ID!, productId: ID!, newQuantity: Int!): CartResponse!
 
 
 }
@@ -31,7 +31,7 @@ type CartItemDto {
     product: ProductDto
 }
 
-type CartResult {
+type CartResponse {
     result: Boolean!
     message: String!
 }
