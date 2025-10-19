@@ -1,4 +1,9 @@
 
+extend type Query {
+
+    getUserProfileInfo(userId: ID!): UserDto
+
+}
 
 extend type Mutation {
 
@@ -12,6 +17,5 @@ type UserDto {
     userId: ID!
     email: String
     username: String
-    cart: CartDto
     roles: [String]
 }

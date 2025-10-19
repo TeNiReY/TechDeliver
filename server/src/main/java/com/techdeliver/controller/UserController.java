@@ -23,6 +23,12 @@ public class UserController {
         return new RegisterResponse(true, "User Account Created Successfully");
     }
 
+    @QueryMapping
+    public UserDto getUserProfileInfo(@Argument UUID userId) {
+        var user =  userService.getUserById(userId);
+        return userService.convertToDto(user);
+    }
+
     @MutationMapping
     public UserDto updateUsername(@Argument UUID userId, @Argument String newUsername) {
         var updatedUser = userService.updateUsername(userId, newUsername);

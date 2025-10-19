@@ -92,6 +92,18 @@ export const REGISTER_MUTATION = gql`
   }
 `;
 
+// User queries
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($userId: ID!) {
+    getUserProfileInfo(userId: $userId) {
+      userId
+      email
+      username
+      roles
+    }
+  }
+`;
+
 // User mutations
 export const UPDATE_USERNAME_MUTATION = gql`
   mutation UpdateUsername($userId: ID!, $newUsername: String!) {
@@ -99,6 +111,7 @@ export const UPDATE_USERNAME_MUTATION = gql`
       userId
       username
       email
+      roles
     }
   }
 `;
@@ -109,6 +122,7 @@ export const UPDATE_PASSWORD_MUTATION = gql`
       userId
       username
       email
+      roles
     }
   }
 `;

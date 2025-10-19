@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import UpdateUsernameForm from '../components/UpdateUsernameForm'
-import UpdatePasswordForm from '../components/UpdatePasswordForm'
+import ProfileInfo from '../components/ProfileInfo'
 import CartView from '../components/CartView'
 import OrdersView from '../components/OrdersView'
 
@@ -30,34 +29,7 @@ const AccountPage = () => {
   const renderContent = () => {
     switch (active) {
       case 'profile':
-        return (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Профиль</h2>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ID пользователя</label>
-                  <p className="mt-1 text-sm text-gray-900 font-mono">{user?.userId || 'Не указан'}</p>
-                  {user?.userId && (
-                    <p className="mt-1 text-xs text-gray-500">Тип: {typeof user.userId}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Статус</label>
-                  <p className="mt-1 text-sm text-green-600">Активен</p>
-                </div>
-              </div>
-              
-              <div className="border-t pt-6">
-                <UpdateUsernameForm />
-              </div>
-              
-              <div className="border-t pt-6">
-                <UpdatePasswordForm />
-              </div>
-            </div>
-          </div>
-        )
+        return <ProfileInfo />
       case 'cart':
         return (
           <div>
@@ -110,25 +82,32 @@ const AccountPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <aside className="md:col-span-1">
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
               {sections.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setActive(s.id)}
-                  className={`w-full text-left px-5 py-4 border-b last:border-b-0 transition-colors ${
+                  className={`w-full text-left px-5 py-4 border-b last:border-b-0 transition-all duration-200 ${
                     active === s.id
-                      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700'
-                      : 'hover:bg-gray-50 text-gray-700'
+                      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 border-l-4 border-l-purple-600 font-medium'
+                      : 'hover:bg-gray-50 text-gray-700 hover:text-purple-600'
                   }`}
                 >
-                  {s.title}
+                  <div className="flex items-center">
+                    <span className="text-sm">{s.title}</span>
+                    {active === s.id && (
+                      <svg className="w-4 h-4 ml-auto text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
           </aside>
 
           <section className="md:col-span-3">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 md:p-8">
+            <div className="bg-white rounded-xl border border-gray-200 p-6 md:p-8 shadow-sm">
               {renderContent()}
             </div>
           </section>
