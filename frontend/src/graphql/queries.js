@@ -141,3 +141,71 @@ export const GET_CART_QUERY = gql`
     }
   }
 `;
+
+// Cart mutations
+export const ADD_ITEM_TO_CART = gql`
+  mutation AddItemToCart($userId: ID!, $productId: ID!, $quantity: Int!) {
+    addItemToCart(userId: $userId, productId: $productId, quantity: $quantity) {
+      result
+      message
+    }
+  }
+`;
+
+export const REMOVE_ITEM_FROM_CART = gql`
+  mutation RemoveItemFromCart($userId: ID!, $productId: ID!) {
+    removeItemFromCart(userId: $userId, productId: $productId) {
+      result
+      message
+    }
+  }
+`;
+
+export const UPDATE_ITEM_QUANTITY = gql`
+  mutation UpdateItemQuantity($userId: ID!, $productId: ID!, $newQuantity: Int!) {
+    updateItemQuantity(userId: $userId, productId: $productId, newQuantity: $newQuantity) {
+      result
+      message
+    }
+  }
+`;
+
+// Order queries
+export const GET_USER_ORDERS = gql`
+  query GetUserOrders($userId: ID!) {
+    getUserOrders(userId: $userId) {
+      id
+      userId
+      orderDate
+      totalAmount
+      status
+      orderItems {
+        productId
+        productName
+        productBrand
+        quantity
+        price
+      }
+    }
+  }
+`;
+
+// Order mutations
+export const PLACE_ORDER = gql`
+  mutation PlaceOrder($userId: ID!) {
+    placeOrder(userId: $userId) {
+      id
+      userId
+      orderDate
+      totalAmount
+      status
+      orderItems {
+        productId
+        productName
+        productBrand
+        quantity
+        price
+      }
+    }
+  }
+`;
