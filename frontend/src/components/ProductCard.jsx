@@ -1,4 +1,26 @@
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { ADD_ITEM_TO_CART, GET_CART_QUERY } from '../graphql/queries';
+import { useAuth } from '../contexts/AuthContext';
+
 const ProductCard = ({ product }) => {
+  const { user } = useAuth();
+  const [isAdding, setIsAdding] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const [addItemToCart] = useMutation(ADD_ITEM_TO_CART, {
+    refetchQueries: [{ query: GET_CART_QUERY, variables: { userId: user?.userId } }],
+    onCompleted: () => {
+      setIsAdding(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+    },
+    onError: (error) => {
+      console.error('Error adding item to cart:', error);
+      setIsAdding(false);
+    }
+  });
+
   const formatPrice = (price) => {
     // Преобразуем строку в число, если это необходимо
     const numericPrice = typeof price === 'string' ? parseFloat(price) : price
@@ -10,6 +32,26 @@ const ProductCard = ({ product }) => {
   }
 
   const isInStock = product.inventory > 0
+
+  const handleAddToCart = async () => {
+    if (!user?.userId) {
+      alert('Необходимо войти в систему для добавления товаров в корзину');
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      await addItemToCart({
+        variables: {
+          userId: user.userId,
+          productId: product.productId,
+          quantity: 1
+        }
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  }
 
   return (
     <div className="product-card">
@@ -58,14 +100,17 @@ const ProductCard = ({ product }) => {
         </div>
 
         <button 
+          onClick={handleAddToCart}
           className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-            isInStock
+            isInStock && !isAdding
               ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:-translate-y-0.5'
+              : isAdding
+              ? 'bg-purple-400 text-white cursor-wait'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
-          disabled={!isInStock}
+          disabled={!isInStock || isAdding}
         >
-          {isInStock ? 'В корзину' : 'Недоступно'}
+          {isAdding ? 'Добавляем...' : showSuccess ? 'Добавлено!' : isInStock ? 'В корзину' : 'Недоступно'}
         </button>
       </div>
     </div>
