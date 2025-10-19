@@ -16,12 +16,12 @@ import java.util.UUID;
 public class CartEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID cartId;
 
     private BigDecimal totalPrice;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItemEntity> cartItems = new HashSet<>();
 
     @OneToOne
@@ -50,7 +50,8 @@ public class CartEntity {
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
-
-
+    public void clearCart() {
+        this.cartItems.clear();
+        this.totalPrice = BigDecimal.ZERO;
+    }
 }
