@@ -140,7 +140,7 @@ const CartView = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Корзина</h2>
         <div className="text-lg font-medium">
-          Общая сумма: <span className="text-purple-600">{cart.totalPrice?.toFixed(2)} ₽</span>
+          Общая сумма: <span className="text-[#950740]">{cart.totalPrice?.toFixed(2)} ₽</span>
         </div>
       </div>
 
@@ -224,10 +224,10 @@ const CartView = () => {
           <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
             <div className="flex justify-between items-center">
               <span>Заказ успешно оформлен! Спасибо за покупку.</span>
-              <button
-                onClick={() => navigate('/account?tab=orders')}
-                className="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors"
-              >
+                <button
+                  onClick={() => navigate('/account?tab=orders')}
+                  className="ml-4 px-3 py-1 bg-[#950740] hover:bg-[#7a052f] text-white text-sm rounded transition-colors"
+                >
                 Посмотреть заказы
               </button>
             </div>
@@ -235,15 +235,15 @@ const CartView = () => {
         )}
         <div className="flex justify-between items-center">
           <div className="text-lg font-medium">
-            Итого: <span className="text-purple-600">{cart.totalPrice?.toFixed(2)} ₽</span>
+            Итого: <span className="text-[#950740]">{cart.totalPrice?.toFixed(2)} ₽</span>
           </div>
           <button 
             onClick={handlePlaceOrder}
             disabled={isPlacingOrder}
             className={`px-6 py-3 rounded-lg font-medium transition-colors ${
               isPlacingOrder
-                ? 'bg-purple-400 text-white cursor-wait'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
+                ? 'bg-[#950740] bg-opacity-70 text-white cursor-wait'
+                : 'bg-[#950740] hover:bg-[#7a052f] text-white'
             }`}
           >
             {isPlacingOrder ? 'Оформляем заказ...' : 'Оформить заказ'}

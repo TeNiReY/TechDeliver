@@ -5,6 +5,7 @@ import CatalogPage from './pages/CatalogPage'
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import AccountPage from './pages/AccountPage'
+import OrdersPage from './pages/OrdersPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import CartPage from './pages/CartPage'
@@ -28,6 +29,11 @@ function App() {
             <Route path="/account" element={
               <ProtectedRoute>
                 <AccountPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute>
+                <OrdersPage />
               </ProtectedRoute>
             } />
             <Route path="/login" element={<LoginPage />} />

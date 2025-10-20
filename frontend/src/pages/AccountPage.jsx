@@ -89,14 +89,14 @@ const AccountPage = () => {
                   onClick={() => setActive(s.id)}
                   className={`w-full text-left px-5 py-4 border-b last:border-b-0 transition-all duration-200 ${
                     active === s.id
-                      ? 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 border-l-4 border-l-purple-600 font-medium'
-                      : 'hover:bg-gray-50 text-gray-700 hover:text-purple-600'
+                      ? 'bg-[#950740] bg-opacity-10 text-[#950740] border-l-4 border-l-[#950740] font-medium'
+                      : 'hover:bg-gray-50 text-gray-700 hover:text-[#950740]'
                   }`}
                 >
                   <div className="flex items-center">
                     <span className="text-sm">{s.title}</span>
                     {active === s.id && (
-                      <svg className="w-4 h-4 ml-auto text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4 ml-auto text-[#950740]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
