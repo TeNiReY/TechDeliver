@@ -253,7 +253,7 @@ const ProfileInfo = () => {
           {!editingUsername && (
             <button
               onClick={() => setEditingUsername(true)}
-              className="text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors"
+              className="text-[#950740] hover:text-[#7a052f] text-sm font-medium transition-colors"
             >
               Изменить
             </button>
@@ -284,7 +284,7 @@ const ProfileInfo = () => {
                 onChange={(e) => setNewUsername(e.target.value)}
                 required
                 minLength={3}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#950740] focus:border-[#950740]"
                 placeholder="Введите новое имя пользователя"
                 autoFocus
               />
@@ -294,7 +294,7 @@ const ProfileInfo = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-[#950740] hover:bg-[#7a052f] text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
               >
                 {loading ? 'Сохранение...' : 'Сохранить'}
               </button>
@@ -318,7 +318,7 @@ const ProfileInfo = () => {
           {!editingPassword && (
             <button
               onClick={() => setEditingPassword(true)}
-              className="text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors"
+              className="text-[#950740] hover:text-[#7a052f] text-sm font-medium transition-colors"
             >
               Изменить
             </button>
@@ -348,7 +348,7 @@ const ProfileInfo = () => {
                 value={passwordData.oldPassword}
                 onChange={(e) => setPasswordData({...passwordData, oldPassword: e.target.value})}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#950740] focus:border-[#950740]"
                 placeholder="Введите текущий пароль"
                 autoFocus
               />
@@ -365,7 +365,7 @@ const ProfileInfo = () => {
                 onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                 required
                 minLength={6}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#950740] focus:border-[#950740]"
                 placeholder="Введите новый пароль"
               />
             </div>
@@ -380,7 +380,7 @@ const ProfileInfo = () => {
                 value={passwordData.confirmPassword}
                 onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#950740] focus:border-[#950740]"
                 placeholder="Подтвердите новый пароль"
               />
             </div>
@@ -389,7 +389,7 @@ const ProfileInfo = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-[#950740] hover:bg-[#7a052f] text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
               >
                 {loading ? 'Сохранение...' : 'Сохранить'}
               </button>

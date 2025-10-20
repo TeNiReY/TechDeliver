@@ -54,10 +54,10 @@ const ProductCard = ({ product }) => {
   }
 
   return (
-    <div className="product-card">
+    <div className="product-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-[#B39CD0]">
       <div className="relative">
-        <div className="bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center h-56 sm:h-60 lg:h-64">
-          <svg className="w-20 h-20 sm:w-24 sm:h-24 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center h-56 sm:h-60 lg:h-64 rounded-t-lg">
+          <svg className="w-20 h-20 sm:w-24 sm:h-24 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
@@ -73,9 +73,9 @@ const ProductCard = ({ product }) => {
         )}
       </div>
 
-      <div className="p-5 sm:p-6">
+      <div className="p-5 sm:p-6 rounded-b-lg">
         <div className="mb-2">
-          <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+          <span className="inline-block bg-purple-100 text-[#B39CD0] text-xs px-2 py-1 rounded-full">
             {product.productCategory?.categoryName || 'Без категории'}
           </span>
         </div>
@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
 
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-[#B39CD0]">
               {formatPrice(product.price)}
             </div>
             <div className="text-xs text-gray-500">
@@ -103,9 +103,9 @@ const ProductCard = ({ product }) => {
           onClick={handleAddToCart}
           className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
             isInStock && !isAdding
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:-translate-y-0.5'
+              ? 'bg-[#B39CD0] text-white hover:bg-[#9575CD] hover:shadow-lg hover:-translate-y-0.5'
               : isAdding
-              ? 'bg-purple-400 text-white cursor-wait'
+              ? 'bg-[#B39CD0] bg-opacity-70 text-white cursor-wait'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
           disabled={!isInStock || isAdding}
