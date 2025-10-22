@@ -3,22 +3,39 @@ extend type Query {
 
     getUserOrders(userId: ID!): [OrderDto]
 
+
+
 }
 
 extend type Mutation {
 
-    placeOrder(userId: ID!): OrderDto
+    placeOrder(input: PlaceOrderInput!): OrderDto
 
+    calculateOrderPreview(input: PlaceOrderInput!): OrderInfoDto
+}
 
-
+input PlaceOrderInput {
+    userId: ID!
+    deliveryAddress: String
+    deliveryUrgency: String
+    distanceInKM: Float
 }
 
 type OrderDto {
     id: String
     userId: String
-    orderDate: String # TODO: i think here will be problem
-    totalAmount: Float
+
+    orderDate: String # TODO:  problem here
+    deliveryAddress: String
+    distanceInKM: Float
+
+    orderTotalPrice: Float
+    orderItemsTotalPrice: Float
+    deliveryTotalPrice: Float
+
+    deliveryUrgency: String
     status: String
+
     orderItems: [OrderItemDto]
 }
 
@@ -28,5 +45,15 @@ type OrderItemDto {
     productBrand: String
     quantity: Int
     price: Float
+}
+
+type OrderInfoDto {
+    userId: ID
+    orderDate: String
+    deliveryAddress: String
+    orderTotalPrice: Float
+    orderItemsTotalPrice: Float
+    deliveryTotalPrice: Float
+    orderItems: [CartItemDto]
 }
 
