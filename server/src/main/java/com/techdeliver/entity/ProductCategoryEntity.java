@@ -19,14 +19,13 @@ import java.util.UUID;
 public class ProductCategoryEntity { //TODO: add base delivery price + base installation price
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID categoryId;
 
     private String categoryName;
 
     private String categoryDescription;
 
-//    @JsonIgnore
     @OneToMany(mappedBy = "productCategory")
     private List<ProductEntity> products;
 
