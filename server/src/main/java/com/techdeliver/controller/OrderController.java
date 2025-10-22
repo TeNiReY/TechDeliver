@@ -1,7 +1,9 @@
 package com.techdeliver.controller;
 
 import com.techdeliver.dto.OrderDto;
+import com.techdeliver.dto.OrderInfoDto;
 import com.techdeliver.entity.OrderEntity;
+import com.techdeliver.request.PlaceOrderRequest;
 import com.techdeliver.service.order.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -15,12 +17,16 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 public class OrderController {
-
     private final IOrderService orderService;
 
-    @MutationMapping //TODO: change converter in service (item)
-    public OrderDto placeOrder(@Argument UUID userId) {
-        OrderEntity order = orderService.placeOrder(userId);
+    @MutationMapping
+    public OrderInfoDto calculateOrderPreview(@Argument PlaceOrderRequest input) {
+        return orderService.calculateOrderInfo(input);
+    }
+
+    @MutationMapping
+    public OrderDto placeOrder(@Argument PlaceOrderRequest input) {
+        OrderEntity order = orderService.placeOrder(input);
         return orderService.convertToDto(order); //TODO: change convert logic here
     }
 
