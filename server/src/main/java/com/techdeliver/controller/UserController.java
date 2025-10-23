@@ -44,6 +44,11 @@ public class UserController {
         return userService.convertToDto(updatedUser);
     }
 
+    @MutationMapping
+    public boolean setDeliveryAddress(@Argument UUID userId, @Argument String address) {
+        return userService.setDeliveryAddress(userId, address);
+    }
+
 
     public record RegisterResponse(boolean result,
                                    String message) {}

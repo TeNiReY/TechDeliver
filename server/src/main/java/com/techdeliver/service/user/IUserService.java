@@ -16,6 +16,8 @@ public interface IUserService {
 
     UserEntity updatePassword(UUID userId, String oldPassword, String newPassword);
 
+    boolean setDeliveryAddress(UUID userId, String address);
+
     List<UserDto> getConvertedProducts(List<UserEntity> users);
 
     UserDto convertToDto(UserEntity cart);

@@ -75,6 +75,17 @@ public class UserService implements IUserService {
                         new ResourceNotFoundException("User not found with id: " + userId)); //TODO: check logic here
     }
 
+//    @Override
+    public boolean setDeliveryAddress(UUID userId, String address) {
+        return Optional.ofNullable(getUserById(userId))
+                .map(u -> {
+                    u.setSavedDeliveryAddress(address);
+                    userRepository.save(u);
+                    return true;
+                }).orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
     @Override
     public List<UserDto> getConvertedProducts(List<UserEntity> users) {
         return users.stream().map(this::convertToDto).toList();
@@ -86,6 +97,7 @@ public class UserService implements IUserService {
         userDto.setUserId(user.getUserId());
         userDto.setUsername(user.getUsername());
         userDto.setEmail(user.getEmail());
+        userDto.setSavedDeliveryAddress(user.getSavedDeliveryAddress());
         // Не включаем cart и roles пока что, чтобы избежать ошибок
         return userDto;
     }
