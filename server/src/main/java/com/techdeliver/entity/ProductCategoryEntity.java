@@ -26,6 +26,8 @@ public class ProductCategoryEntity { //TODO: add base delivery price + base inst
 
     private String categoryDescription;
 
+    private double installationComplexityCoefficient = 1;
+
     @OneToMany(mappedBy = "productCategory")
     private List<ProductEntity> products;
 

@@ -31,6 +31,7 @@ public class OrderEntity {
     private BigDecimal orderTotalPrice;
     private BigDecimal orderItemsTotalPrice;
     private BigDecimal deliveryTotalPrice;
+    private BigDecimal installationPrice;
 
 
     @Enumerated(EnumType.STRING)
@@ -47,7 +48,7 @@ public class OrderEntity {
     private UserEntity user;
 
     public void calculateOrderTotalPrice() {
-        orderTotalPrice = orderItemsTotalPrice.add(deliveryTotalPrice);
+        orderTotalPrice = orderItemsTotalPrice.add(deliveryTotalPrice).add(installationPrice);
     }
 
 }
