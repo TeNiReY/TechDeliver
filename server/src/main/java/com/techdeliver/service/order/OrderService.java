@@ -12,6 +12,7 @@ import com.techdeliver.repository.ProductRepository;
 import com.techdeliver.request.PlaceOrderRequest;
 import com.techdeliver.service.cart.ICartService;
 import com.techdeliver.util.DeliveryPriceCalculator;
+import com.techdeliver.util.InstallationPriceCalculator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class OrderService implements IOrderService {
     private final ICartService cartService;
 
     private final ModelMapper modelMapper;
+
+    private final InstallationPriceCalculator installationPriceCalculator;
 
     @Override
     public OrderInfoDto calculateOrderInfo(PlaceOrderRequest request) {
@@ -56,6 +59,9 @@ public class OrderService implements IOrderService {
                         DeliveryUrgency.valueOf(request.getDeliveryUrgency()));
 
         orderInfo.setDeliveryTotalPrice(BigDecimal.valueOf(deliveryTotalAmount));
+
+        orderInfo.setInstallationPrice(installationPriceCalculator.calculateInstallationPrice(cart.getCartItems()));
+
         orderInfo.setOrderItemsTotalPrice(calculateOrderItemsTotalPrice(cart.getCartItems()));
         orderInfo.setOrderTotalPrice(calculateTotalAmount(orderInfo));
         orderInfo.setOrderItems(cart.getCartItems());
@@ -77,6 +83,7 @@ public class OrderService implements IOrderService {
         List<OrderItemEntity> orderItemList = createOrderItems(order, cart);
         order.setOrderItems(new HashSet<>(orderItemList));
         order.setOrderItemsTotalPrice(calculateOrderItemsTotalAmount(orderItemList));
+        order.setInstallationPrice(installationPriceCalculator.calculateInstallationPrice(cart.getCartItems()));
         order.calculateOrderTotalPrice();
 
         OrderEntity savedOrder = orderRepository.save(order);
@@ -141,7 +148,7 @@ public class OrderService implements IOrderService {
     }
 
     private BigDecimal calculateTotalAmount(OrderInfoDto orderInfo) {
-        return orderInfo.getOrderItemsTotalPrice().add(orderInfo.getDeliveryTotalPrice());
+        return orderInfo.getOrderItemsTotalPrice().add(orderInfo.getDeliveryTotalPrice()).add(orderInfo.getInstallationPrice());
     }
 
     private BigDecimal calculateOrderItemsTotalPrice(Set<CartItemEntity> items) {
