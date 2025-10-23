@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { useAuth } from '../contexts/AuthContext'
-import { GET_CART_QUERY } from '../graphql/queries'
+import { GET_CART_QUERY, GET_USER_PROFILE } from '../graphql/queries'
 import { useState, useEffect } from 'react'
 
 const Header = () => {
@@ -14,7 +14,19 @@ const Header = () => {
     pollInterval: 5000, // Обновляем каждые 5 секунд
   });
 
+  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER_PROFILE, {
+    variables: { userId: user?.userId },
+    skip: !user?.userId,
+    fetchPolicy: 'cache-and-network', // Всегда получаем свежие данные
+  });
+
+  console.log('Header - user:', user);
+  console.log('Header - userData:', userData);
+  console.log('Header - userLoading:', userLoading);
+  console.log('Header - userError:', userError);
+
   const cartItemCount = cartData?.getCart?.cartItems?.reduce((total, item) => total + item.quantity, 0) || 0;
+  const savedAddress = userData?.getUserProfileInfo?.savedDeliveryAddress || 'Минск, улица Игоря Лученка 27';
 
   const handleLogout = () => {
     logout();
@@ -44,7 +56,7 @@ const Header = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
               </svg>
-              <span>Минск, улица Игоря Лученка 27</span>
+              <span>{savedAddress}</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-6">
