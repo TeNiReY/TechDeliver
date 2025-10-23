@@ -13,4 +13,5 @@ public class PlaceOrderRequest {
     private String deliveryAddress; //TODO: вот по этому параметру надо высчитывать расстояние
     private String deliveryUrgency;
     private double distanceInKM; //TODO: временно (потом реализовать автоматический расчет)
+    private boolean needInstallation;
 }

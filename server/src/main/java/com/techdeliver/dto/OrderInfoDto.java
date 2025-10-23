@@ -25,6 +25,8 @@ public class OrderInfoDto {
     private BigDecimal orderTotalPrice;
     private BigDecimal orderItemsTotalPrice;
     private BigDecimal deliveryTotalPrice;
+    private BigDecimal installationPrice;
+
     private String status;
     private Set<CartItemEntity> orderItems;
 

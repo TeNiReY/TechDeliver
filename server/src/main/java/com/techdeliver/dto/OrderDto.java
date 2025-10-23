@@ -21,6 +21,7 @@ public class OrderDto {
     private BigDecimal orderTotalPrice;
     private BigDecimal orderItemsTotalPrice;
     private BigDecimal deliveryTotalPrice;
+    private BigDecimal installationPrice;
 
     private String deliveryUrgency;
     private String status;
