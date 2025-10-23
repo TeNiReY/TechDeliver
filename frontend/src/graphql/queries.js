@@ -100,6 +100,7 @@ export const GET_USER_PROFILE = gql`
       email
       username
       roles
+      savedDeliveryAddress
     }
   }
 `;
@@ -112,6 +113,7 @@ export const UPDATE_USERNAME_MUTATION = gql`
       username
       email
       roles
+      savedDeliveryAddress
     }
   }
 `;
@@ -123,7 +125,14 @@ export const UPDATE_PASSWORD_MUTATION = gql`
       username
       email
       roles
+      savedDeliveryAddress
     }
+  }
+`;
+
+export const SET_DELIVERY_ADDRESS_MUTATION = gql`
+  mutation SetDeliveryAddress($userId: ID!, $address: String!) {
+    setDeliveryAddress(userId: $userId, address: $address)
   }
 `;
 
@@ -196,6 +205,7 @@ export const GET_USER_ORDERS = gql`
       orderTotalPrice
       orderItemsTotalPrice
       deliveryTotalPrice
+      installationPrice
       deliveryUrgency
       status
       orderItems {
@@ -219,6 +229,7 @@ export const CALCULATE_ORDER_PREVIEW = gql`
       orderTotalPrice
       orderItemsTotalPrice
       deliveryTotalPrice
+      installationPrice
       orderItems {
         cartItemId
         quantity
@@ -251,6 +262,7 @@ export const PLACE_ORDER = gql`
       orderTotalPrice
       orderItemsTotalPrice
       deliveryTotalPrice
+      installationPrice
       deliveryUrgency
       status
       orderItems {
