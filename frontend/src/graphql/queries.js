@@ -191,7 +191,12 @@ export const GET_USER_ORDERS = gql`
       id
       userId
       orderDate
-      totalAmount
+      deliveryAddress
+      distanceInKM
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      deliveryUrgency
       status
       orderItems {
         productId
@@ -205,13 +210,48 @@ export const GET_USER_ORDERS = gql`
 `;
 
 // Order mutations
+export const CALCULATE_ORDER_PREVIEW = gql`
+  mutation CalculateOrderPreview($input: PlaceOrderInput!) {
+    calculateOrderPreview(input: $input) {
+      userId
+      orderDate
+      deliveryAddress
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      orderItems {
+        cartItemId
+        quantity
+        unitPrice
+        totalPrice
+        product {
+          productId
+          productName
+          productBrand
+          productModel
+          images {
+            id
+            fileName
+            downloadUrl
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const PLACE_ORDER = gql`
-  mutation PlaceOrder($userId: ID!) {
-    placeOrder(userId: $userId) {
+  mutation PlaceOrder($input: PlaceOrderInput!) {
+    placeOrder(input: $input) {
       id
       userId
       orderDate
-      totalAmount
+      deliveryAddress
+      distanceInKM
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      deliveryUrgency
       status
       orderItems {
         productId

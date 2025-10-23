@@ -108,33 +108,69 @@ const OrdersView = () => {
 
       <div className="space-y-4">
         {orders.map((order) => (
-          <div key={order.id} className="bg-white border border-gray-200 rounded-lg p-6">
+          <div key={order.id} className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-[#950740] transition-colors">
             {/* Order Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
                   Заказ #{order.id}
                 </h3>
-                <p className="text-sm text-gray-500">
-                  {formatDate(order.orderDate)}
+                <p className="text-sm text-gray-500 mt-1">
+                  📅 {formatDate(order.orderDate)}
                 </p>
+                {order.deliveryAddress && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    📍 {order.deliveryAddress}
+                  </p>
+                )}
               </div>
               <div className="text-right">
-                <div className="text-lg font-semibold text-gray-900">
-                  {order.totalAmount?.toFixed(2)} ₽
+                <div className="text-xl font-bold text-[#950740] mb-1">
+                  {order.orderTotalPrice?.toFixed(2)} ₽
                 </div>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
                   {getStatusText(order.status)}
                 </span>
               </div>
             </div>
 
+            {/* Delivery Information */}
+            {(order.distanceInKM || order.deliveryUrgency) && (
+              <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
+                  <svg className="w-4 h-4 mr-1 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2m6 2a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2" />
+                  </svg>
+                  Информация о доставке
+                </h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {order.distanceInKM && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Расстояние:</span>
+                      <span className="font-medium text-gray-900">{order.distanceInKM} км</span>
+                    </div>
+                  )}
+                  {order.deliveryUrgency && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Срочность:</span>
+                      <span className="font-medium text-gray-900">
+                        {order.deliveryUrgency === 'STANDARD' ? 'Стандартная' : 'Срочная'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Order Items */}
             <div className="border-t pt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Товары в заказе:</h4>
+              <h4 className="text-sm font-semibold text-gray-900 mb-3">Товары в заказе:</h4>
               <div className="space-y-2">
                 {order.orderItems?.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
+                  <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900">
                         {item.productName}
@@ -156,18 +192,40 @@ const OrdersView = () => {
               </div>
             </div>
 
-            {/* Order Actions */}
+            {/* Price Breakdown */}
+            {(order.orderItemsTotalPrice || order.deliveryTotalPrice) && (
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mt-4">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">Детализация стоимости:</h4>
+                <div className="space-y-1 text-sm">
+                  {order.orderItemsTotalPrice && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>Товары:</span>
+                      <span className="font-medium">{order.orderItemsTotalPrice.toFixed(2)} ₽</span>
+                    </div>
+                  )}
+                  {order.deliveryTotalPrice && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>Доставка:</span>
+                      <span className="font-medium">{order.deliveryTotalPrice.toFixed(2)} ₽</span>
+                    </div>
+                  )}
+                  <div className="border-t border-purple-300 pt-2 flex justify-between text-base font-bold text-[#950740]">
+                    <span>Итого:</span>
+                    <span>{order.orderTotalPrice?.toFixed(2)} ₽</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Order Footer */}
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-500">
+                <div className="text-xs text-gray-500">
                   ID заказа: {order.id}
                 </div>
                 <div className="flex space-x-2">
-                  <button className="px-3 py-1 text-sm text-purple-600 hover:text-purple-800 border border-purple-200 hover:border-purple-300 rounded transition-colors">
+                  <button className="px-3 py-1 text-sm text-[#950740] hover:text-[#7a052f] border border-[#950740] hover:border-[#7a052f] rounded-lg transition-colors font-medium">
                     Повторить заказ
-                  </button>
-                  <button className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 hover:border-gray-300 rounded transition-colors">
-                    Подробнее
                   </button>
                 </div>
               </div>
