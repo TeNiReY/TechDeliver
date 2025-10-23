@@ -66,17 +66,32 @@ const OrdersView = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-        <span className="ml-2 text-gray-600">Загрузка заказов...</span>
+      <div className="flex flex-col justify-center items-center py-16">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#B39CD0]"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <svg className="w-6 h-6 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+        </div>
+        <span className="mt-4 text-gray-700 font-medium">Загрузка заказов...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Ошибка загрузки заказов: {error.message}
+      <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 rounded-xl p-6 shadow-md">
+        <div className="flex items-start space-x-3">
+          <svg className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <h3 className="text-lg font-bold text-red-800 mb-1">Ошибка загрузки заказов</h3>
+            <p className="text-red-700">{error.message}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -85,53 +100,88 @@ const OrdersView = () => {
 
   if (orders.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 mb-4">
-          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <div className="text-center py-16">
+        <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <svg className="w-12 h-12 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Заказов пока нет</h3>
-        <p className="text-gray-500">Ваши заказы будут отображаться здесь после оформления</p>
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent mb-2">
+          Заказов пока нет
+        </h3>
+        <p className="text-gray-600 mb-6">Ваши заказы будут отображаться здесь после оформления</p>
+        <a href="/" className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-[#950740] to-[#B39CD0] hover:from-[#7a052f] hover:to-[#9575CD] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Начать покупки</span>
+        </a>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Мои заказы</h2>
-        <div className="text-sm text-gray-500">
-          Всего заказов: {orders.length}
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent">
+            Мои заказы
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">История ваших покупок</p>
+        </div>
+        <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 rounded-xl border border-purple-200">
+          <svg className="w-5 h-5 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span className="text-sm font-semibold text-gray-700">
+            Всего: {orders.length}
+          </span>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {orders.map((order) => (
-          <div key={order.id} className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-[#950740] transition-colors">
+          <div key={order.id} className="bg-white bg-opacity-90 backdrop-blur-sm border-2 border-purple-100 rounded-2xl p-6 hover:border-[#950740] hover:shadow-xl transition-all duration-300">
             {/* Order Header */}
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  Заказ #{order.id}
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  📅 {formatDate(order.orderDate)}
-                </p>
+            <div className="flex justify-between items-start mb-5 pb-4 border-b-2 border-purple-100">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#950740] to-[#B39CD0] rounded-xl flex items-center justify-center shadow-md">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Заказ #{order.id}
+                  </h3>
+                </div>
+                <div className="flex items-center space-x-4 text-sm">
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-4 h-4 mr-1.5 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {formatDate(order.orderDate)}
+                  </div>
+                </div>
                 {order.deliveryAddress && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    📍 {order.deliveryAddress}
-                  </p>
+                  <div className="flex items-start text-sm text-gray-600 mt-2 bg-blue-50 px-3 py-2 rounded-lg inline-flex">
+                    <svg className="w-4 h-4 mr-1.5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="font-medium">{order.deliveryAddress}</span>
+                  </div>
                 )}
               </div>
-              <div className="text-right">
-                <div className="text-xl font-bold text-[#950740] mb-1">
-                  {order.orderTotalPrice?.toFixed(2)} ₽
+              <div className="text-right ml-4">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 mb-3 border border-purple-200">
+                  <div className="text-xs text-gray-600 mb-1">Сумма заказа</div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent">
+                    {order.orderTotalPrice?.toFixed(2)} ₽
+                  </div>
                 </div>
-                <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                <span className={`inline-flex items-center px-4 py-2 text-sm font-bold rounded-xl shadow-md ${getStatusColor(order.status)}`}>
+                  <span className="w-2 h-2 bg-current rounded-full mr-2 animate-pulse"></span>
                   {getStatusText(order.status)}
                 </span>
               </div>
@@ -139,26 +189,28 @@ const OrdersView = () => {
 
             {/* Delivery Information */}
             {(order.distanceInKM || order.deliveryUrgency) && (
-              <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2m6 2a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2" />
-                  </svg>
-                  Информация о доставке
-                </h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded-xl p-4 mb-5 shadow-sm">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2m6 2a2 2 0 104 0m-4 0a2 2 0 114 0m-4 0v-2m4 2v-2" />
+                    </svg>
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-900">Информация о доставке</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
                   {order.distanceInKM && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Расстояние:</span>
-                      <span className="font-medium text-gray-900">{order.distanceInKM} км</span>
+                    <div className="bg-white bg-opacity-60 rounded-lg p-3">
+                      <div className="text-xs text-gray-600 mb-1">Расстояние</div>
+                      <div className="text-lg font-bold text-gray-900">{order.distanceInKM} км</div>
                     </div>
                   )}
                   {order.deliveryUrgency && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Срочность:</span>
-                      <span className="font-medium text-gray-900">
-                        {order.deliveryUrgency === 'STANDARD' ? 'Стандартная' : 'Срочная'}
-                      </span>
+                    <div className="bg-white bg-opacity-60 rounded-lg p-3">
+                      <div className="text-xs text-gray-600 mb-1">Срочность</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        {order.deliveryUrgency === 'STANDARD' ? 'Стандартная' : order.deliveryUrgency === 'NEXT_DAY' ? 'Ускоренная' : 'Экстренная'}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -166,24 +218,34 @@ const OrdersView = () => {
             )}
 
             {/* Order Items */}
-            <div className="border-t pt-4">
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">Товары в заказе:</h4>
-              <div className="space-y-2">
+            <div className="mb-5">
+              <div className="flex items-center space-x-2 mb-4">
+                <svg className="w-5 h-5 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <h4 className="text-sm font-bold text-gray-900">Товары в заказе</h4>
+              </div>
+              <div className="space-y-3">
                 {order.orderItems?.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {item.productName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {item.productBrand}
-                      </p>
+                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center text-white font-bold">
+                        {item.quantity}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {item.productName}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {item.productBrand}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">
-                        {item.quantity} шт. × {item.price?.toFixed(2)} ₽
+                    <div className="text-right ml-4">
+                      <p className="text-xs text-gray-600">
+                        {item.quantity} × {item.price?.toFixed(2)} ₽
                       </p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-base font-bold text-[#950740] mt-0.5">
                         {(item.quantity * item.price)?.toFixed(2)} ₽
                       </p>
                     </div>
@@ -193,39 +255,62 @@ const OrdersView = () => {
             </div>
 
             {/* Price Breakdown */}
-            {(order.orderItemsTotalPrice || order.deliveryTotalPrice) && (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mt-4">
-                <h4 className="text-sm font-semibold text-gray-900 mb-2">Детализация стоимости:</h4>
-                <div className="space-y-1 text-sm">
+            {(order.orderItemsTotalPrice || order.deliveryTotalPrice || order.installationPrice) && (
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 border-2 border-purple-200 rounded-2xl p-5 shadow-md">
+                <div className="flex items-center space-x-2 mb-4">
+                  <svg className="w-5 h-5 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <h4 className="text-sm font-bold text-gray-900">Детализация стоимости</h4>
+                </div>
+                <div className="space-y-3">
                   {order.orderItemsTotalPrice && (
-                    <div className="flex justify-between text-gray-700">
-                      <span>Товары:</span>
-                      <span className="font-medium">{order.orderItemsTotalPrice.toFixed(2)} ₽</span>
+                    <div className="flex justify-between items-center bg-white bg-opacity-60 rounded-lg p-3">
+                      <span className="text-sm text-gray-700 font-medium">Товары</span>
+                      <span className="text-base font-bold text-gray-900">{order.orderItemsTotalPrice.toFixed(2)} ₽</span>
                     </div>
                   )}
                   {order.deliveryTotalPrice && (
-                    <div className="flex justify-between text-gray-700">
-                      <span>Доставка:</span>
-                      <span className="font-medium">{order.deliveryTotalPrice.toFixed(2)} ₽</span>
+                    <div className="flex justify-between items-center bg-white bg-opacity-60 rounded-lg p-3">
+                      <span className="text-sm text-gray-700 font-medium">Доставка</span>
+                      <span className="text-base font-bold text-gray-900">{order.deliveryTotalPrice.toFixed(2)} ₽</span>
                     </div>
                   )}
-                  <div className="border-t border-purple-300 pt-2 flex justify-between text-base font-bold text-[#950740]">
-                    <span>Итого:</span>
-                    <span>{order.orderTotalPrice?.toFixed(2)} ₽</span>
+                  {order.installationPrice > 0 && (
+                    <div className="flex justify-between items-center bg-white bg-opacity-60 rounded-lg p-3">
+                      <span className="text-sm text-gray-700 font-medium flex items-center">
+                        <svg className="w-4 h-4 mr-1 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Установка
+                      </span>
+                      <span className="text-base font-bold text-gray-900">{order.installationPrice.toFixed(2)} ₽</span>
+                    </div>
+                  )}
+                  <div className="bg-gradient-to-r from-[#950740] to-[#B39CD0] rounded-xl p-4 flex justify-between items-center shadow-lg">
+                    <span className="text-white font-bold">Итого</span>
+                    <span className="text-2xl font-bold text-white">{order.orderTotalPrice?.toFixed(2)} ₽</span>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Order Footer */}
-            <div className="border-t pt-4 mt-4">
+            <div className="border-t-2 border-purple-100 pt-4 mt-5">
               <div className="flex justify-between items-center">
-                <div className="text-xs text-gray-500">
-                  ID заказа: {order.id}
+                <div className="flex items-center space-x-2 text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <span className="font-mono font-semibold">ID: {order.id}</span>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="px-3 py-1 text-sm text-[#950740] hover:text-[#7a052f] border border-[#950740] hover:border-[#7a052f] rounded-lg transition-colors font-medium">
-                    Повторить заказ
+                  <button className="flex items-center space-x-2 px-5 py-2.5 text-sm bg-gradient-to-r from-[#950740] to-[#B39CD0] hover:from-[#7a052f] hover:to-[#9575CD] text-white rounded-xl transition-all font-semibold shadow-md hover:shadow-lg hover:scale-105 duration-200">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Повторить заказ</span>
                   </button>
                 </div>
               </div>

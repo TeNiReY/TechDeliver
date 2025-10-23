@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
-import { GET_CART_QUERY, REMOVE_ITEM_FROM_CART, UPDATE_ITEM_QUANTITY, CALCULATE_ORDER_PREVIEW, PLACE_ORDER } from '../graphql/queries';
+import { GET_CART_QUERY, REMOVE_ITEM_FROM_CART, UPDATE_ITEM_QUANTITY, CALCULATE_ORDER_PREVIEW, PLACE_ORDER, GET_USER_PROFILE, SET_DELIVERY_ADDRESS_MUTATION } from '../graphql/queries';
 import { useAuth } from '../contexts/AuthContext';
 
 const CartView = () => {
@@ -12,10 +12,12 @@ const CartView = () => {
   const [orderStep, setOrderStep] = useState('cart'); // 'cart', 'preview', 'success'
   const [orderPreview, setOrderPreview] = useState(null);
   const [showDeliveryForm, setShowDeliveryForm] = useState(false);
+  const [showSaveAddressDialog, setShowSaveAddressDialog] = useState(false);
   const [deliveryData, setDeliveryData] = useState({
     deliveryAddress: '',
     deliveryUrgency: 'STANDARD',
-    distanceInKM: 0
+    distanceInKM: 0,
+    needInstallation: false
   });
   
   const { data, loading, error, refetch } = useQuery(GET_CART_QUERY, {
@@ -25,6 +27,16 @@ const CartView = () => {
       console.error('Cart query error:', error);
     }
   });
+
+  const { data: userData, refetch: refetchUserProfile, loading: userLoading, error: userError } = useQuery(GET_USER_PROFILE, {
+    variables: { userId: user?.userId },
+    skip: !user?.userId,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  console.log('CartView - userData:', userData);
+  console.log('CartView - userLoading:', userLoading);
+  console.log('CartView - userError:', userError);
 
   const [removeItemFromCart] = useMutation(REMOVE_ITEM_FROM_CART, {
     onCompleted: () => {
@@ -58,15 +70,47 @@ const CartView = () => {
   });
 
   const [placeOrder] = useMutation(PLACE_ORDER, {
-    onCompleted: () => {
+    onCompleted: (data) => {
+      console.log('Order placed successfully:', data);
       setIsPlacingOrder(false);
-      setOrderStep('success');
+      
+      // Проверяем, нужно ли предложить сохранить адрес
+      const savedAddress = userData?.getUserProfileInfo?.savedDeliveryAddress;
+      const currentAddress = deliveryData.deliveryAddress;
+      
+      console.log('Checking address save:');
+      console.log('  savedAddress:', savedAddress);
+      console.log('  currentAddress:', currentAddress);
+      console.log('  Should show dialog:', currentAddress && currentAddress !== savedAddress);
+      
+      if (currentAddress && currentAddress !== savedAddress) {
+        console.log('Showing save address dialog');
+        setShowSaveAddressDialog(true);
+      } else {
+        console.log('Skipping to success screen');
+        setOrderStep('success');
+      }
+      
       refetch();
     },
     onError: (error) => {
       console.error('Error placing order:', error);
       alert('Ошибка при оформлении заказа: ' + error.message);
       setIsPlacingOrder(false);
+    }
+  });
+
+  const [setDeliveryAddress] = useMutation(SET_DELIVERY_ADDRESS_MUTATION, {
+    onCompleted: () => {
+      refetchUserProfile();
+      setShowSaveAddressDialog(false);
+      setOrderStep('success');
+    },
+    onError: (error) => {
+      console.error('Error saving address:', error);
+      alert('Ошибка при сохранении адреса: ' + error.message);
+      setShowSaveAddressDialog(false);
+      setOrderStep('success');
     }
   });
 
@@ -126,7 +170,8 @@ const CartView = () => {
             userId: user.userId,
             deliveryAddress: deliveryData.deliveryAddress,
             deliveryUrgency: deliveryData.deliveryUrgency,
-            distanceInKM: parseFloat(deliveryData.distanceInKM)
+            distanceInKM: parseFloat(deliveryData.distanceInKM),
+            needInstallation: deliveryData.needInstallation
           }
         }
       });
@@ -149,7 +194,8 @@ const CartView = () => {
             userId: user.userId,
             deliveryAddress: deliveryData.deliveryAddress,
             deliveryUrgency: deliveryData.deliveryUrgency,
-            distanceInKM: parseFloat(deliveryData.distanceInKM)
+            distanceInKM: parseFloat(deliveryData.distanceInKM),
+            needInstallation: deliveryData.needInstallation
           }
         }
       });
@@ -157,6 +203,37 @@ const CartView = () => {
       console.error('Error placing order:', error);
     }
   };
+
+  const handleSaveAddress = async () => {
+    try {
+      await setDeliveryAddress({
+        variables: {
+          userId: user.userId,
+          address: deliveryData.deliveryAddress
+        }
+      });
+    } catch (error) {
+      console.error('Error saving address:', error);
+    }
+  };
+
+  const handleSkipSaveAddress = () => {
+    setShowSaveAddressDialog(false);
+    setOrderStep('success');
+  };
+
+  // Автоматически подставляем сохраненный адрес при открытии формы доставки
+  useEffect(() => {
+    if (showDeliveryForm && userData?.getUserProfileInfo?.savedDeliveryAddress) {
+      const savedAddress = userData.getUserProfileInfo.savedDeliveryAddress;
+      if (!deliveryData.deliveryAddress) {
+        setDeliveryData(prev => ({
+          ...prev,
+          deliveryAddress: savedAddress
+        }));
+      }
+    }
+  }, [showDeliveryForm, userData]);
 
   console.log('CartView - user:', user);
   console.log('CartView - userId:', user?.userId);
@@ -178,18 +255,45 @@ const CartView = () => {
     );
   }
 
-  const cart = data?.getCart;
-
-  if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
+  // Save Address Dialog - проверяем ПЕРЕД проверкой пустой корзины
+  if (showSaveAddressDialog) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 mb-4">
-          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
+      <div className="max-w-2xl mx-auto py-12">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-[#950740] rounded-2xl p-8 shadow-xl">
+          <div className="mb-6 flex justify-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#950740] to-[#B39CD0] rounded-full flex items-center justify-center shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">Сохранить адрес доставки?</h2>
+          <p className="text-gray-700 mb-2 text-center">Хотите сохранить этот адрес для будущих заказов?</p>
+          <div className="bg-white rounded-lg p-4 mb-6 border-2 border-purple-200">
+            <div className="flex items-start space-x-2">
+              <svg className="w-5 h-5 text-[#950740] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <p className="text-gray-900 font-medium">{deliveryData.deliveryAddress}</p>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <button
+              onClick={handleSkipSaveAddress}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+            >
+              Нет, спасибо
+            </button>
+            <button
+              onClick={handleSaveAddress}
+              className="px-6 py-3 bg-gradient-to-r from-[#950740] to-[#B39CD0] hover:from-[#7a052f] hover:to-[#9575CD] text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+            >
+              Да, сохранить адрес
+            </button>
+          </div>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Корзина пуста</h3>
-        <p className="text-gray-500">Добавьте товары в корзину, чтобы увидеть их здесь</p>
       </div>
     );
   }
@@ -221,7 +325,8 @@ const CartView = () => {
                 setDeliveryData({
                   deliveryAddress: '',
                   deliveryUrgency: 'STANDARD',
-                  distanceInKM: 0
+                  distanceInKM: 0,
+                  needInstallation: false
                 });
               }}
               className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
@@ -230,6 +335,23 @@ const CartView = () => {
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  const cart = data?.getCart;
+
+  // Проверка пустой корзины (после диалогов)
+  if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-400 mb-4">
+          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Корзина пуста</h3>
+        <p className="text-gray-500">Добавьте товары в корзину, чтобы увидеть их здесь</p>
       </div>
     );
   }
@@ -324,6 +446,18 @@ const CartView = () => {
                 <span className="font-medium">Стоимость доставки:</span>
                 <span className="font-semibold">{orderPreview.deliveryTotalPrice?.toFixed(2)} ₽</span>
               </div>
+              {orderPreview.installationPrice > 0 && (
+                <div className="flex justify-between text-gray-700">
+                  <span className="font-medium flex items-center">
+                    <svg className="w-4 h-4 mr-1 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Установка:
+                  </span>
+                  <span className="font-semibold">{orderPreview.installationPrice?.toFixed(2)} ₽</span>
+                </div>
+              )}
               <div className="border-t-2 border-purple-300 pt-3 flex justify-between text-xl font-bold text-[#950740]">
                 <span>Итого к оплате:</span>
                 <span>{orderPreview.orderTotalPrice?.toFixed(2)} ₽</span>
@@ -547,6 +681,33 @@ const CartView = () => {
                     </div>
                   </label>
                 </div>
+              </div>
+
+              {/* Installation Option */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Дополнительные услуги
+                </label>
+                <label className="flex items-start space-x-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-[#950740] transition-colors bg-gradient-to-r from-blue-50 to-purple-50">
+                  <input
+                    type="checkbox"
+                    checked={deliveryData.needInstallation}
+                    onChange={(e) => setDeliveryData({ ...deliveryData, needInstallation: e.target.checked })}
+                    className="mt-1 w-5 h-5 text-[#950740] focus:ring-[#950740] rounded border-gray-300"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <div className="font-medium text-gray-900">Требуется установка</div>
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Наши специалисты установят и настроят оборудование. Цена зависит от общей суммы заказа.
+                    </div>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
