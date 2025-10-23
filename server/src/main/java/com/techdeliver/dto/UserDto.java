@@ -17,4 +17,5 @@ public class UserDto {
     private String username;
 //    private CartEntity cart;
 //    private Collection<RoleEntity> roles; // need or not?
+    private String savedDeliveryAddress;
 }

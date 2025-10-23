@@ -35,6 +35,8 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<RoleEntity> roles;
 
+    private String savedDeliveryAddress;
+
     public UserEntity() {
         cart = new CartEntity();
         cart.setUser(this);

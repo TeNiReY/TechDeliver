@@ -11,6 +11,8 @@ extend type Mutation {
 
     updateUserPassword(userId: ID!, oldPass: String!, newPass: String!): UserDto
 
+    setDeliveryAddress(userId: ID!, address: String!): Boolean
+
 }
 
 type UserDto {
@@ -18,4 +20,5 @@ type UserDto {
     email: String
     username: String
     roles: [String]
+    savedDeliveryAddress: String
 }

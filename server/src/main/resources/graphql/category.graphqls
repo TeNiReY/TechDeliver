@@ -1,14 +1,11 @@
 
 extend type Query {
 
-
-
     getCategoryById(categoryId: ID!): CategoryResponse!
 
     getCategoryByName(name: String!): CategoryResponse!
 
     getAllCategories: CategoryListResponse!
-
 
 }
 
@@ -34,12 +31,14 @@ type CategoryDto {
     categoryId: ID
     categoryName: String
     categoryDescription: String
+    installationComplexityCoefficient: Float
     products: [ProductDto]
 }
 
 input CreateCategoryInput {
     name: String!
     description: String
+    installationComplexityCoefficient: Float
 }
 
 
