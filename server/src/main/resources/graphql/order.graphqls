@@ -19,6 +19,7 @@ input PlaceOrderInput {
     deliveryAddress: String
     deliveryUrgency: String
     distanceInKM: Float
+    needInstallation: Boolean
 }
 
 type OrderDto {
@@ -32,6 +33,7 @@ type OrderDto {
     orderTotalPrice: Float
     orderItemsTotalPrice: Float
     deliveryTotalPrice: Float
+    installationPrice: Float
 
     deliveryUrgency: String
     status: String
@@ -54,6 +56,7 @@ type OrderInfoDto {
     orderTotalPrice: Float
     orderItemsTotalPrice: Float
     deliveryTotalPrice: Float
+    installationPrice: Float
     orderItems: [CartItemDto]
 }
 
