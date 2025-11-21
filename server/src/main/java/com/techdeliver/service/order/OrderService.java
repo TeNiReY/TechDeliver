@@ -7,6 +7,7 @@ import com.techdeliver.entity.*;
 import com.techdeliver.enums.OrderStatus;
 import com.techdeliver.enums.delivery.DeliveryUrgency;
 import com.techdeliver.exception.EmptyCartException;
+import com.techdeliver.exception.ResourceNotFoundException;
 import com.techdeliver.repository.OrderRepository;
 import com.techdeliver.repository.ProductRepository;
 import com.techdeliver.request.PlaceOrderRequest;
@@ -36,6 +37,18 @@ public class OrderService implements IOrderService {
     private final ModelMapper modelMapper;
 
     private final InstallationPriceCalculator installationPriceCalculator;
+
+    @Override
+    public OrderEntity getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order with id " +  orderId + " not found!"));
+    }
+
+    @Override
+    public List<OrderEntity> getAllOrders() {
+        return orderRepository.findAll();
+    }
 
     @Override
     public OrderInfoDto calculateOrderInfo(PlaceOrderRequest request) {
@@ -166,5 +179,13 @@ public class OrderService implements IOrderService {
                         .multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    @Override
+    public OrderEntity updateOrderStatus(UUID orderId, String status) {
+        var order = getOrderById(orderId);
+        order.setOrderStatus(OrderStatus.valueOf(status)); //TODO: add ex handle
+        return orderRepository.save(order);
+    }
+
 
 }

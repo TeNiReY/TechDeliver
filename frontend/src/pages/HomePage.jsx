@@ -24,9 +24,10 @@ const HomePage = () => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-left mb-8">
-            <div className="inline-block mb-2">
-              <span className="text-sm font-semibold text-[#950740] bg-[#B39CD0] bg-opacity-10 px-3 py-1 rounded-full">
-                ⭐ Наши категории
+            <div className="inline-flex items-center mb-3">
+              <div className="w-1 h-8 bg-gradient-to-b from-[#950740] to-[#B39CD0] rounded-full mr-3"></div>
+              <span className="text-sm font-semibold text-[#950740] uppercase tracking-wider">
+                Наши категории
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent">
@@ -115,9 +116,10 @@ const HomePage = () => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-left mb-8">
-            <div className="inline-block mb-2">
-              <span className="text-sm font-semibold text-[#950740] bg-[#B39CD0] bg-opacity-10 px-3 py-1 rounded-full">
-                🔥 Хиты продаж
+            <div className="inline-flex items-center mb-3">
+              <div className="w-1 h-8 bg-gradient-to-b from-purple-600 to-[#950740] rounded-full mr-3"></div>
+              <span className="text-sm font-semibold text-[#950740] uppercase tracking-wider">
+                Хиты продаж
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-[#950740] bg-clip-text text-transparent">

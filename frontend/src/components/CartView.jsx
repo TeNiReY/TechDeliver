@@ -423,11 +423,11 @@ const CartView = () => {
                       {item.product?.productBrand} {item.product?.productModel}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {item.unitPrice?.toFixed(2)} ₽ × {item.quantity} шт.
+                      {item.unitPrice?.toFixed(2)} Br × {item.quantity} шт.
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="font-medium text-gray-900">{item.totalPrice?.toFixed(2)} ₽</span>
+                    <span className="font-medium text-gray-900">{item.totalPrice?.toFixed(2)} Br</span>
                   </div>
                 </div>
               ))}
@@ -440,11 +440,11 @@ const CartView = () => {
             <div className="space-y-3">
               <div className="flex justify-between text-gray-700">
                 <span className="font-medium">Стоимость товаров:</span>
-                <span className="font-semibold">{orderPreview.orderItemsTotalPrice?.toFixed(2)} ₽</span>
+                <span className="font-semibold">{orderPreview.orderItemsTotalPrice?.toFixed(2)} Br</span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span className="font-medium">Стоимость доставки:</span>
-                <span className="font-semibold">{orderPreview.deliveryTotalPrice?.toFixed(2)} ₽</span>
+                <span className="font-semibold">{orderPreview.deliveryTotalPrice?.toFixed(2)} Br</span>
               </div>
               {orderPreview.installationPrice > 0 && (
                 <div className="flex justify-between text-gray-700">
@@ -455,12 +455,12 @@ const CartView = () => {
                     </svg>
                     Установка:
                   </span>
-                  <span className="font-semibold">{orderPreview.installationPrice?.toFixed(2)} ₽</span>
+                  <span className="font-semibold">{orderPreview.installationPrice?.toFixed(2)} Br</span>
                 </div>
               )}
               <div className="border-t-2 border-purple-300 pt-3 flex justify-between text-xl font-bold text-[#950740]">
                 <span>Итого к оплате:</span>
-                <span>{orderPreview.orderTotalPrice?.toFixed(2)} ₽</span>
+                <span>{orderPreview.orderTotalPrice?.toFixed(2)} Br</span>
               </div>
             </div>
           </div>
@@ -496,7 +496,7 @@ const CartView = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Корзина</h2>
         <div className="text-lg font-medium">
-          Сумма товаров: <span className="text-[#950740]">{cart.totalPrice?.toFixed(2)} ₽</span>
+          Сумма товаров: <span className="text-[#950740]">{cart.totalPrice?.toFixed(2)} Br</span>
         </div>
       </div>
 
@@ -532,7 +532,7 @@ const CartView = () => {
                 </p>
                 <div className="mt-1 flex items-center space-x-4">
                   <span className="text-sm text-gray-600">
-                    Цена: {item.unitPrice?.toFixed(2)} ₽
+                    Цена: {item.unitPrice?.toFixed(2)} Br
                   </span>
                 </div>
               </div>
@@ -561,7 +561,7 @@ const CartView = () => {
               {/* Total Price and Remove Button */}
               <div className="flex-shrink-0 text-right">
                 <div className="text-lg font-medium text-gray-900 mb-2">
-                  {item.totalPrice?.toFixed(2)} ₽
+                  {item.totalPrice?.toFixed(2)} Br
                 </div>
                 <button
                   onClick={() => handleRemoveItem(item.product.productId)}

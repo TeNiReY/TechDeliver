@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +17,10 @@ public class UserDto {
     private String email;
     private String username;
 //    private CartEntity cart;
-//    private Collection<RoleEntity> roles; // need or not?
+    private Set<String> roles = new java.util.HashSet<>();
     private String savedDeliveryAddress;
+
+    public void addUserRoles(Collection<RoleEntity> collectionRoles) {
+        collectionRoles.forEach(role -> roles.add(role.getName()));
+    }
 }

@@ -9,17 +9,23 @@ import OrdersPage from './pages/OrdersPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import CartPage from './pages/CartPage'
+import FavoritesPage from './pages/FavoritesPage'
+import AdminPage from './pages/AdminPage'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
+import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider } from './contexts/AuthContext'
+import { FavoritesProvider } from './contexts/FavoritesContext'
 
 function App() {
   return (
     <AuthProvider>
-      <div className="app min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">
+      <FavoritesProvider>
+        <ScrollToTop />
+        <div className="app min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/catalog" element={<CatalogPage />} />
@@ -43,10 +49,21 @@ function App() {
                 <CartPage />
               </ProtectedRoute>
             } />
+            <Route path="/favorites" element={
+              <ProtectedRoute>
+                <FavoritesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
         <Footer />
       </div>
+      </FavoritesProvider>
     </AuthProvider>
   )
 }

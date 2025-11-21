@@ -13,6 +13,10 @@ extend type Mutation {
 
     createCategory(input: CreateCategoryInput!): CategoryResponse!
 
+    updateCategory(categoryId: ID!, input: UpdateCategoryInput): CategoryResponse!
+
+    deleteCategory(categoryId: ID!): Boolean
+
 }
 
 
@@ -36,6 +40,12 @@ type CategoryDto {
 }
 
 input CreateCategoryInput {
+    name: String!
+    description: String
+    installationComplexityCoefficient: Float
+}
+
+input UpdateCategoryInput {
     name: String!
     description: String
     installationComplexityCoefficient: Float

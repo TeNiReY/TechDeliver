@@ -18,9 +18,10 @@ const Hero = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="text-left">
-              <div className="inline-block mb-4">
-                <span className="bg-[#B39CD0] bg-opacity-10 text-[#950740] px-4 py-2 rounded-full text-sm font-semibold">
-                  🎉 Добро пожаловать
+              <div className="inline-flex items-center mb-4 bg-white bg-opacity-60 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+                <div className="w-2 h-2 bg-[#950740] rounded-full mr-2 animate-pulse"></div>
+                <span className="text-[#950740] text-sm font-semibold uppercase tracking-wider">
+                  Добро пожаловать
                 </span>
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">

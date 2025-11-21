@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -35,12 +36,34 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Collection<RoleEntity> roles;
 
+//    private Set<String> savedDeliveryAddress = new HashSet<>();
     private String savedDeliveryAddress;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_saved_products",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "product_id", referencedColumnName = "productId")
+    )
+    private Set<ProductEntity> savedProducts = new HashSet<>();
+
 
     public UserEntity() {
         cart = new CartEntity();
         cart.setUser(this);
         roles = new HashSet<>();
     }
+
+    public void addRole(RoleEntity role) {
+        roles.add(role);
+    }
+
+    public void addSavedProduct(ProductEntity product) {
+        savedProducts.add(product);
+    }
+
+//    public void addNewDeliveryAddress(String address) {
+//        savedDeliveryAddress.add(address);
+//    }
 
 }

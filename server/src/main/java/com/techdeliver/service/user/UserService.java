@@ -1,12 +1,15 @@
 package com.techdeliver.service.user;
 
 import com.techdeliver.dto.UserDto;
+import com.techdeliver.entity.ProductEntity;
 import com.techdeliver.entity.UserEntity;
 import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.InvalidCredentialsException;
 import com.techdeliver.exception.ResourceNotFoundException;
+import com.techdeliver.repository.RoleRepository;
 import com.techdeliver.repository.UserRepository;
 import com.techdeliver.request.RegisterRequest;
+import com.techdeliver.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -21,6 +25,8 @@ import java.util.UUID;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final IProductService productService;
+    private final RoleRepository roleRepository;
 
     private final ModelMapper modelMapper;
 
@@ -29,6 +35,11 @@ public class UserService implements IUserService {
         return userRepository.findById(userId)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
+    @Override
+    public List<UserEntity> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -41,6 +52,7 @@ public class UserService implements IUserService {
                     userEntity.setUsername(request.getUsername());
                     userEntity.setEmail(request.getEmail());
                     userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+                    userEntity.addRole(roleRepository.findByName("USER"));
                     return userRepository.save(userEntity);
                 }).orElseThrow(() ->
                         new AlreadyExistsException("User with the same credentials already exists!"));
@@ -87,7 +99,37 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> getConvertedProducts(List<UserEntity> users) {
+    public Set<ProductEntity> getUserSavedProducts(UUID userId) {
+        return Optional.ofNullable(getUserById(userId))
+                .map(UserEntity::getSavedProducts).orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
+    @Override
+    public ProductEntity saveProduct(UUID productId, UUID userId) {
+        var product = productService.getProductById(productId);
+
+        var user = getUserById(userId);
+
+        user.addSavedProduct(product);
+        userRepository.save(user);
+        return product;
+    }
+
+    @Override
+    public ProductEntity unsaveProduct(UUID productId, UUID userId) {
+        var product = productService.getProductById(productId);
+
+        var user = getUserById(userId);
+
+        user.getSavedProducts().remove(product);
+        userRepository.save(user);
+        return product;
+    }
+
+
+    @Override
+    public List<UserDto> getConvertedUsers(List<UserEntity> users) {
         return users.stream().map(this::convertToDto).toList();
     }
 
@@ -98,6 +140,7 @@ public class UserService implements IUserService {
         userDto.setUsername(user.getUsername());
         userDto.setEmail(user.getEmail());
         userDto.setSavedDeliveryAddress(user.getSavedDeliveryAddress());
+        userDto.addUserRoles(user.getRoles());
         // Не включаем cart и roles пока что, чтобы избежать ошибок
         return userDto;
     }

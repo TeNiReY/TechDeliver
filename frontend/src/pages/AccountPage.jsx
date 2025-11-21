@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext'
 import ProfileInfo from '../components/ProfileInfo'
 import CartView from '../components/CartView'
 import OrdersView from '../components/OrdersView'
+import FavoritesView from '../components/FavoritesView'
+import DeliveryAddressView from '../components/DeliveryAddressView'
 
 const sections = [
   { id: 'profile', title: 'Профиль' },
@@ -40,19 +42,9 @@ const AccountPage = () => {
       case 'orders':
         return <OrdersView />
       case 'addresses':
-        return (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Адреса доставки</h2>
-            <div className="rounded-lg border border-gray-200 p-6 text-gray-600">Добавьте адрес для быстрой доставки.</div>
-          </div>
-        )
+        return <DeliveryAddressView />
       case 'favorites':
-        return (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Избранное</h2>
-            <div className="rounded-lg border border-gray-200 p-6 text-gray-600">Сохранённые товары появятся здесь.</div>
-          </div>
-        )
+        return <FavoritesView />
       case 'security':
         return (
           <div>

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { ADD_ITEM_TO_CART, GET_CART_QUERY } from '../graphql/queries';
+import { ADD_ITEM_TO_CART, GET_CART_QUERY, SAVE_PRODUCT, UNSAVE_PRODUCT, GET_USER_SAVED_PRODUCTS } from '../graphql/queries';
 import { useAuth } from '../contexts/AuthContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onRemove }) => {
   const { user } = useAuth();
+  const { isSaved, toggleFavorite } = useFavorites();
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  const saved = isSaved(product.productId);
 
   const [addItemToCart] = useMutation(ADD_ITEM_TO_CART, {
     refetchQueries: [{ query: GET_CART_QUERY, variables: { userId: user?.userId } }],
@@ -21,14 +25,36 @@ const ProductCard = ({ product }) => {
     }
   });
 
+  const [saveProduct] = useMutation(SAVE_PRODUCT, {
+    refetchQueries: [{ query: GET_USER_SAVED_PRODUCTS, variables: { userId: user?.userId } }],
+    onCompleted: () => {
+      toggleFavorite(product.productId);
+    },
+    onError: (error) => {
+      console.error('Error saving product:', error);
+    }
+  });
+
+  const [unsaveProduct] = useMutation(UNSAVE_PRODUCT, {
+    refetchQueries: [{ query: GET_USER_SAVED_PRODUCTS, variables: { userId: user?.userId } }],
+    onCompleted: () => {
+      toggleFavorite(product.productId);
+      if (onRemove) {
+        onRemove(product.productId);
+      }
+    },
+    onError: (error) => {
+      console.error('Error unsaving product:', error);
+    }
+  });
+
   const formatPrice = (price) => {
     // Преобразуем строку в число, если это необходимо
     const numericPrice = typeof price === 'string' ? parseFloat(price) : price
     return new Intl.NumberFormat('ru-RU', {
-      style: 'currency',
-      currency: 'RUB',
-      minimumFractionDigits: 0,
-    }).format(numericPrice)
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(numericPrice) + ' Br'
   }
 
   const isInStock = product.inventory > 0
@@ -53,6 +79,36 @@ const ProductCard = ({ product }) => {
     }
   }
 
+  const handleToggleSave = async (e) => {
+    e.stopPropagation();
+    if (!user?.userId) {
+      alert('Необходимо войти в систему для сохранения товаров');
+      return;
+    }
+
+    try {
+      if (saved) {
+        // Если товар уже сохранен - удаляем
+        await unsaveProduct({
+          variables: {
+            productId: product.productId,
+            userId: user.userId
+          }
+        });
+      } else {
+        // Если товар не сохранен - сохраняем
+        await saveProduct({
+          variables: {
+            productId: product.productId,
+            userId: user.userId
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+    }
+  }
+
   return (
     <div className="product-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-[#B39CD0]">
       <div className="relative">
@@ -61,13 +117,34 @@ const ProductCard = ({ product }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
+        
+        {/* Кнопка избранного */}
+        <button
+          onClick={handleToggleSave}
+          className="absolute top-4 right-4 p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200 z-10"
+        >
+          <svg 
+            className={`w-6 h-6 transition-colors ${saved ? 'text-red-500 fill-current' : 'text-gray-400'}`}
+            fill={saved ? 'currentColor' : 'none'}
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+            />
+          </svg>
+        </button>
+
         {!isInStock && (
-          <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
             Нет в наличии
           </div>
         )}
         {isInStock && product.inventory < 5 && (
-          <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
             Скоро закончится
           </div>
         )}

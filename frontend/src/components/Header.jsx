@@ -5,7 +5,7 @@ import { GET_CART_QUERY, GET_USER_PROFILE } from '../graphql/queries'
 import { useState, useEffect } from 'react'
 
 const Header = () => {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout, user, isAdmin } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const { data: cartData } = useQuery(GET_CART_QUERY, {
@@ -26,7 +26,9 @@ const Header = () => {
   console.log('Header - userError:', userError);
 
   const cartItemCount = cartData?.getCart?.cartItems?.reduce((total, item) => total + item.quantity, 0) || 0;
-  const savedAddress = userData?.getUserProfileInfo?.savedDeliveryAddress || 'Минск, улица Игоря Лученка 27';
+  const savedAddress = isAuthenticated() && userData?.getUserProfileInfo?.savedDeliveryAddress 
+    ? userData.getUserProfileInfo.savedDeliveryAddress 
+    : 'Указать адрес';
 
   const handleLogout = () => {
     logout();
@@ -51,35 +53,19 @@ const Header = () => {
       {/* Top Bar */}
       <div className="bg-[#B39CD0] bg-opacity-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-8 text-sm text-white">
-            <div className="flex items-center space-x-1">
+          <div className="flex items-center h-8 text-sm text-white">
+            <Link 
+              to={isAuthenticated() ? "/account?tab=addresses" : "/login"}
+              className="flex items-center space-x-1 hover:text-gray-200 transition-colors cursor-pointer"
+            >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
               </svg>
               <span>{savedAddress}</span>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-6">
-              <Link to="/club" className="hover:text-gray-200 transition-colors">TechDeliver Клуб</Link>
-              <Link to="/brands" className="hover:text-gray-200 transition-colors">Бренды</Link>
-              <div className="flex items-center space-x-1 hover:text-gray-200 transition-colors cursor-pointer">
-                <span>Для бизнеса</span>
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <Link to="/careers" className="hover:text-gray-200 transition-colors">Работа в TechDeliver</Link>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <div className="bg-white bg-opacity-20 px-2 py-1 rounded text-xs">
-                <span className="font-semibold">Б</span> 0,00 ₽
-              </div>
-              <div className="bg-white bg-opacity-20 px-2 py-1 rounded text-xs flex items-center space-x-1">
-                <div className="w-3 h-2 bg-red-500 rounded-sm"></div>
-                <span>BYN</span>
-              </div>
-            </div>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </Link>
           </div>
         </div>
       </div>
@@ -103,6 +89,20 @@ const Header = () => {
               </svg>
               Каталог
             </Link>
+
+            {/* Admin Button - только для админов */}
+            {isAdmin() && (
+              <Link 
+                to="/admin" 
+                className="hidden md:flex items-center bg-gradient-to-r from-[#950740] to-[#B39CD0] text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Админ-панель
+              </Link>
+            )}
             
             <button className="md:hidden bg-white bg-opacity-20 p-2 rounded">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

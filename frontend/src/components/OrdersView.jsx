@@ -177,7 +177,7 @@ const OrdersView = () => {
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 mb-3 border border-purple-200">
                   <div className="text-xs text-gray-600 mb-1">Сумма заказа</div>
                   <div className="text-2xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent">
-                    {order.orderTotalPrice?.toFixed(2)} ₽
+                    {order.orderTotalPrice?.toFixed(2)} Br
                   </div>
                 </div>
                 <span className={`inline-flex items-center px-4 py-2 text-sm font-bold rounded-xl shadow-md ${getStatusColor(order.status)}`}>
@@ -243,10 +243,10 @@ const OrdersView = () => {
                     </div>
                     <div className="text-right ml-4">
                       <p className="text-xs text-gray-600">
-                        {item.quantity} × {item.price?.toFixed(2)} ₽
+                        {item.quantity} × {item.price?.toFixed(2)} Br
                       </p>
                       <p className="text-base font-bold text-[#950740] mt-0.5">
-                        {(item.quantity * item.price)?.toFixed(2)} ₽
+                        {(item.quantity * item.price)?.toFixed(2)} Br
                       </p>
                     </div>
                   </div>
@@ -267,13 +267,13 @@ const OrdersView = () => {
                   {order.orderItemsTotalPrice && (
                     <div className="flex justify-between items-center bg-white bg-opacity-60 rounded-lg p-3">
                       <span className="text-sm text-gray-700 font-medium">Товары</span>
-                      <span className="text-base font-bold text-gray-900">{order.orderItemsTotalPrice.toFixed(2)} ₽</span>
+                      <span className="text-base font-bold text-gray-900">{order.orderItemsTotalPrice.toFixed(2)} Br</span>
                     </div>
                   )}
                   {order.deliveryTotalPrice && (
                     <div className="flex justify-between items-center bg-white bg-opacity-60 rounded-lg p-3">
                       <span className="text-sm text-gray-700 font-medium">Доставка</span>
-                      <span className="text-base font-bold text-gray-900">{order.deliveryTotalPrice.toFixed(2)} ₽</span>
+                      <span className="text-base font-bold text-gray-900">{order.deliveryTotalPrice.toFixed(2)} Br</span>
                     </div>
                   )}
                   {order.installationPrice > 0 && (
@@ -285,12 +285,12 @@ const OrdersView = () => {
                         </svg>
                         Установка
                       </span>
-                      <span className="text-base font-bold text-gray-900">{order.installationPrice.toFixed(2)} ₽</span>
+                      <span className="text-base font-bold text-gray-900">{order.installationPrice.toFixed(2)} Br</span>
                     </div>
                   )}
                   <div className="bg-gradient-to-r from-[#950740] to-[#B39CD0] rounded-xl p-4 flex justify-between items-center shadow-lg">
                     <span className="text-white font-bold">Итого</span>
-                    <span className="text-2xl font-bold text-white">{order.orderTotalPrice?.toFixed(2)} ₽</span>
+                    <span className="text-2xl font-bold text-white">{order.orderTotalPrice?.toFixed(2)} Br</span>
                   </div>
                 </div>
               </div>
@@ -298,20 +298,12 @@ const OrdersView = () => {
 
             {/* Order Footer */}
             <div className="border-t-2 border-purple-100 pt-4 mt-5">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-end items-center">
                 <div className="flex items-center space-x-2 text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                   <span className="font-mono font-semibold">ID: {order.id}</span>
-                </div>
-                <div className="flex space-x-2">
-                  <button className="flex items-center space-x-2 px-5 py-2.5 text-sm bg-gradient-to-r from-[#950740] to-[#B39CD0] hover:from-[#7a052f] hover:to-[#9575CD] text-white rounded-xl transition-all font-semibold shadow-md hover:shadow-lg hover:scale-105 duration-200">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>Повторить заказ</span>
-                  </button>
                 </div>
               </div>
             </div>
