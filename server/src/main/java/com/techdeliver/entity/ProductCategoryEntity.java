@@ -16,17 +16,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "categories")
-public class ProductCategoryEntity { //TODO: add base delivery price + base installation price
+public class ProductCategoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID categoryId;
 
     private String categoryName;
 
     private String categoryDescription;
 
-//    @JsonIgnore
+    private double installationComplexityCoefficient = 1;
+
     @OneToMany(mappedBy = "productCategory")
     private List<ProductEntity> products;
 

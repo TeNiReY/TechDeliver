@@ -1,13 +1,19 @@
 package com.techdeliver.service.order;
 
 import com.techdeliver.dto.OrderDto;
+import com.techdeliver.dto.OrderInfoDto;
 import com.techdeliver.dto.OrderItemDto;
 import com.techdeliver.entity.*;
 import com.techdeliver.enums.OrderStatus;
+import com.techdeliver.enums.delivery.DeliveryUrgency;
 import com.techdeliver.exception.EmptyCartException;
+import com.techdeliver.exception.ResourceNotFoundException;
 import com.techdeliver.repository.OrderRepository;
 import com.techdeliver.repository.ProductRepository;
+import com.techdeliver.request.PlaceOrderRequest;
 import com.techdeliver.service.cart.ICartService;
+import com.techdeliver.util.DeliveryPriceCalculator;
+import com.techdeliver.util.InstallationPriceCalculator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -30,21 +36,71 @@ public class OrderService implements IOrderService {
 
     private final ModelMapper modelMapper;
 
+    private final InstallationPriceCalculator installationPriceCalculator;
 
     @Override
-    public OrderEntity placeOrder(UUID userId) {
-        var cart = cartService.getCartByUserId(userId);
+    public OrderEntity getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order with id " +  orderId + " not found!"));
+    }
+
+    @Override
+    public List<OrderEntity> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    public OrderInfoDto calculateOrderInfo(PlaceOrderRequest request) {
+        var cart = cartService.getCartByUserId(request.getUserId());
 
         if (cart == null || cart.getCartItems().isEmpty()) {
             throw new EmptyCartException("Cart is empty");
         }
 
-        OrderEntity order = createOrder(cart);
+        OrderInfoDto orderInfo = new OrderInfoDto();
+        orderInfo.setUserId(request.getUserId());
+        orderInfo.setOrderDate(LocalDate.now());
+        orderInfo.setDeliveryAddress(request.getDeliveryAddress());
+        //TODO: set date when is order come
+        orderInfo.setStatus(request.getDeliveryUrgency());
+
+        double deliveryTotalAmount = DeliveryPriceCalculator
+                .calculateTotalDeliveryPrice(
+                        cart.getCartItems(),
+                        request.getDistanceInKM(),
+                        DeliveryUrgency.valueOf(request.getDeliveryUrgency()));
+
+        orderInfo.setDeliveryTotalPrice(BigDecimal.valueOf(deliveryTotalAmount));
+
+        orderInfo.setInstallationPrice(installationPriceCalculator.calculateInstallationPrice(cart.getCartItems()));
+
+        orderInfo.setOrderItemsTotalPrice(calculateOrderItemsTotalPrice(cart.getCartItems()));
+        orderInfo.setOrderTotalPrice(calculateTotalAmount(orderInfo));
+        orderInfo.setOrderItems(cart.getCartItems());
+
+        return orderInfo;
+    }
+
+
+    @Override
+    public OrderEntity placeOrder(PlaceOrderRequest request) {
+        var cart = cartService.getCartByUserId(request.getUserId());
+
+        if (cart == null || cart.getCartItems().isEmpty()) {
+            throw new EmptyCartException("Cart is empty");
+        } //TODO: here check is cart was changed
+
+
+        OrderEntity order = createOrder(cart, request);
         List<OrderItemEntity> orderItemList = createOrderItems(order, cart);
         order.setOrderItems(new HashSet<>(orderItemList));
-        order.setOrderTotalAmount(calculateTotalAmount(orderItemList));
+        order.setOrderItemsTotalPrice(calculateOrderItemsTotalAmount(orderItemList));
+        order.setInstallationPrice(installationPriceCalculator.calculateInstallationPrice(cart.getCartItems()));
+        order.calculateOrderTotalPrice();
+
         OrderEntity savedOrder = orderRepository.save(order);
-        cartService.clearCart(userId);
+        cartService.clearCart(order.getUser().getUserId());
 
         return savedOrder;
     }
@@ -60,16 +116,12 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderDto convertToDto(OrderEntity order) { //(update this logic)
-//        return modelMapper.map(order, OrderDto.class); //TODO: check how this works
-
+    public OrderDto convertToDto(OrderEntity order) {
         OrderDto orderDto = modelMapper.map(order, OrderDto.class);
-
         Set<OrderItemDto> orderItemDtos = order.getOrderItems()
                 .stream()
                 .map(item -> modelMapper.map(item, OrderItemDto.class))
                 .collect(Collectors.toSet());
-
         orderDto.setOrderItems(orderItemDtos);
         return orderDto;
     }
@@ -77,11 +129,21 @@ public class OrderService implements IOrderService {
 
 
 
-    private OrderEntity createOrder(CartEntity cart) {
+    private OrderEntity createOrder(CartEntity cart, PlaceOrderRequest request) { //TODO: change here
         OrderEntity order = new OrderEntity();
         order.setUser(cart.getUser());
         order.setOrderStatus(OrderStatus.PENDING); //TODO: update status
         order.setOrderDate(LocalDate.now());
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setDeliveryUrgency(DeliveryUrgency.valueOf(request.getDeliveryUrgency()));
+
+        double deliveryTotalPrice = DeliveryPriceCalculator
+                .calculateTotalDeliveryPrice(
+                        cart.getCartItems(),
+                        request.getDistanceInKM(),
+                        DeliveryUrgency.valueOf(request.getDeliveryUrgency()));
+        order.setDeliveryTotalPrice(BigDecimal.valueOf(deliveryTotalPrice));
+
         return order;
     }
 
@@ -98,13 +160,32 @@ public class OrderService implements IOrderService {
         }).toList();
     }
 
-    private BigDecimal calculateTotalAmount(List<OrderItemEntity> orderItemList) {
+    private BigDecimal calculateTotalAmount(OrderInfoDto orderInfo) {
+        return orderInfo.getOrderItemsTotalPrice().add(orderInfo.getDeliveryTotalPrice()).add(orderInfo.getInstallationPrice());
+    }
+
+    private BigDecimal calculateOrderItemsTotalPrice(Set<CartItemEntity> items) {
+        return items
+                .stream()
+                .map(item -> item.getProduct().getPrice()
+                        .multiply(new BigDecimal(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal calculateOrderItemsTotalAmount(List<OrderItemEntity> orderItemList) {
         return orderItemList
                 .stream()
                 .map(item -> item.getPrice()
                         .multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
     }
+
+    @Override
+    public OrderEntity updateOrderStatus(UUID orderId, String status) {
+        var order = getOrderById(orderId);
+        order.setOrderStatus(OrderStatus.valueOf(status)); //TODO: add ex handle
+        return orderRepository.save(order);
+    }
+
 
 }

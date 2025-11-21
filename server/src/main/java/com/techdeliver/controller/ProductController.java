@@ -63,6 +63,7 @@ public class ProductController {
         return true;
     }
 
+
     public record ProductResponse(ProductDto productDto,
                                         String message) {}
 

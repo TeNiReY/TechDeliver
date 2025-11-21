@@ -92,6 +92,19 @@ export const REGISTER_MUTATION = gql`
   }
 `;
 
+// User queries
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($userId: ID!) {
+    getUserProfileInfo(userId: $userId) {
+      userId
+      email
+      username
+      roles
+      savedDeliveryAddress
+    }
+  }
+`;
+
 // User mutations
 export const UPDATE_USERNAME_MUTATION = gql`
   mutation UpdateUsername($userId: ID!, $newUsername: String!) {
@@ -99,6 +112,8 @@ export const UPDATE_USERNAME_MUTATION = gql`
       userId
       username
       email
+      roles
+      savedDeliveryAddress
     }
   }
 `;
@@ -109,7 +124,15 @@ export const UPDATE_PASSWORD_MUTATION = gql`
       userId
       username
       email
+      roles
+      savedDeliveryAddress
     }
+  }
+`;
+
+export const SET_DELIVERY_ADDRESS_MUTATION = gql`
+  mutation SetDeliveryAddress($userId: ID!, $address: String!) {
+    setDeliveryAddress(userId: $userId, address: $address)
   }
 `;
 
@@ -177,7 +200,13 @@ export const GET_USER_ORDERS = gql`
       id
       userId
       orderDate
-      totalAmount
+      deliveryAddress
+      distanceInKM
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      installationPrice
+      deliveryUrgency
       status
       orderItems {
         productId
@@ -191,13 +220,50 @@ export const GET_USER_ORDERS = gql`
 `;
 
 // Order mutations
+export const CALCULATE_ORDER_PREVIEW = gql`
+  mutation CalculateOrderPreview($input: PlaceOrderInput!) {
+    calculateOrderPreview(input: $input) {
+      userId
+      orderDate
+      deliveryAddress
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      installationPrice
+      orderItems {
+        cartItemId
+        quantity
+        unitPrice
+        totalPrice
+        product {
+          productId
+          productName
+          productBrand
+          productModel
+          images {
+            id
+            fileName
+            downloadUrl
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const PLACE_ORDER = gql`
-  mutation PlaceOrder($userId: ID!) {
-    placeOrder(userId: $userId) {
+  mutation PlaceOrder($input: PlaceOrderInput!) {
+    placeOrder(input: $input) {
       id
       userId
       orderDate
-      totalAmount
+      deliveryAddress
+      distanceInKM
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      installationPrice
+      deliveryUrgency
       status
       orderItems {
         productId
@@ -206,6 +272,146 @@ export const PLACE_ORDER = gql`
         quantity
         price
       }
+    }
+  }
+`;
+
+// Favorites queries and mutations
+export const GET_USER_SAVED_PRODUCTS = gql`
+  query GetUserSavedProducts($userId: ID!) {
+    getUserSavedProducts(userId: $userId) {
+      productId
+      productName
+      price
+      inventory
+      productBrand
+      productModel
+      productDescription
+      productCategory {
+        categoryId
+        categoryName
+        categoryDescription
+      }
+    }
+  }
+`;
+
+export const SAVE_PRODUCT = gql`
+  mutation SaveProduct($productId: ID!, $userId: ID!) {
+    saveProduct(productId: $productId, userId: $userId) {
+      productId
+      productName
+      price
+    }
+  }
+`;
+
+export const GET_SAVED_PRODUCT_IDS = gql`
+  query GetSavedProductIds($userId: ID!) {
+    getSavedProductsIds(userId: $userId)
+  }
+`;
+
+export const UNSAVE_PRODUCT = gql`
+  mutation UnsaveProduct($productId: ID!, $userId: ID!) {
+    unsaveProduct(productId: $productId, userId: $userId)
+  }
+`;
+
+// Admin - Products
+export const ADD_PRODUCT = gql`
+  mutation AddProduct($input: AddProductInput!) {
+    addProduct(input: $input) {
+      productDto {
+        productId
+        productName
+        price
+        inventory
+      }
+      message
+    }
+  }
+`;
+
+export const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct($productId: ID!, $input: UpdateProductInput!) {
+    updateProduct(productId: $productId, input: $input) {
+      productDto {
+        productId
+        productName
+        price
+        inventory
+        productDescription
+      }
+      message
+    }
+  }
+`;
+
+export const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($productId: ID!) {
+    deleteProduct(productId: $productId)
+  }
+`;
+
+// Admin - Categories
+export const CREATE_CATEGORY = gql`
+  mutation CreateCategory($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
+      categoryDto {
+        categoryId
+        categoryName
+        categoryDescription
+      }
+      message
+    }
+  }
+`;
+
+// Admin - Users
+export const GET_ALL_USERS = gql`
+  query GetAllUsers {
+    getAllUsers {
+      userId
+      email
+      username
+      roles
+      savedDeliveryAddress
+    }
+  }
+`;
+
+// Admin - Orders
+export const GET_ALL_ORDERS = gql`
+  query GetAllOrders {
+    getAllOrders {
+      id
+      userId
+      orderDate
+      deliveryAddress
+      distanceInKM
+      orderTotalPrice
+      orderItemsTotalPrice
+      deliveryTotalPrice
+      installationPrice
+      deliveryUrgency
+      status
+      orderItems {
+        productId
+        productName
+        productBrand
+        quantity
+        price
+      }
+    }
+  }
+`;
+
+export const UPDATE_ORDER_STATUS = gql`
+  mutation UpdateOrderStatus($orderId: ID!, $status: String!) {
+    updateOrderStatus(orderId: $orderId, status: $status) {
+      id
+      status
     }
   }
 `;

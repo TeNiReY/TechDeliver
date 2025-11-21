@@ -27,11 +27,11 @@ const CategoryCard = ({ category, onClick }) => {
 
   return (
     <div 
-      className="category-card bg-white rounded-xl shadow-md p-6 cursor-pointer border-2 border-transparent hover:border-purple-500"
+      className="category-card bg-white rounded-xl shadow-md hover:shadow-lg p-6 cursor-pointer border-2 border-transparent hover:border-[#B39CD0] transition-all duration-300"
       onClick={onClick}
     >
       <div className="flex flex-col items-center text-center">
-        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-full mb-4">
+        <div className="bg-[#B39CD0] p-4 rounded-full mb-4">
           <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {getCategoryIcon(category.categoryName)}
           </svg>
