@@ -1,20 +1,21 @@
 
 extend type Query {
 
-
-
     getCategoryById(categoryId: ID!): CategoryResponse!
 
     getCategoryByName(name: String!): CategoryResponse!
 
     getAllCategories: CategoryListResponse!
 
-
 }
 
 extend type Mutation {
 
     createCategory(input: CreateCategoryInput!): CategoryResponse!
+
+    updateCategory(categoryId: ID!, input: UpdateCategoryInput): CategoryResponse!
+
+    deleteCategory(categoryId: ID!): Boolean
 
 }
 
@@ -34,12 +35,20 @@ type CategoryDto {
     categoryId: ID
     categoryName: String
     categoryDescription: String
+    installationComplexityCoefficient: Float
     products: [ProductDto]
 }
 
 input CreateCategoryInput {
     name: String!
     description: String
+    installationComplexityCoefficient: Float
+}
+
+input UpdateCategoryInput {
+    name: String!
+    description: String
+    installationComplexityCoefficient: Float
 }
 
 

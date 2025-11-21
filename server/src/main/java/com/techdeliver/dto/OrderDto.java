@@ -13,8 +13,18 @@ import java.util.UUID;
 public class OrderDto {
     private UUID id;
     private UUID userId;
+
     private LocalDate orderDate;
-    private BigDecimal totalAmount;
+    private String deliveryAddress;
+    private double distanceInKM;
+
+    private BigDecimal orderTotalPrice;
+    private BigDecimal orderItemsTotalPrice;
+    private BigDecimal deliveryTotalPrice;
+    private BigDecimal installationPrice;
+
+    private String deliveryUrgency;
     private String status;
+
     private Set<OrderItemDto> orderItems;
 }

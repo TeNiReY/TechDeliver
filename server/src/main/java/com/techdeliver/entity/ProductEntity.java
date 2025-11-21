@@ -16,10 +16,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "products")
-public class ProductEntity { //TODO: add image
+public class ProductEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID productId;
 
     @ManyToOne(cascade = CascadeType.ALL)

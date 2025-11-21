@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "cart_items")
-public class CartItemEntity {
+public class CartItemEntity { //TODO: зачем нам unitPrice? и totalPrice неправильно считается
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,7 +30,7 @@ public class CartItemEntity {
     private CartEntity cart;
 
     public void setTotalPrice() {
-        this.totalPrice = this.unitPrice.multiply(this.product.getPrice());
+        this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity)); // TODO: check this
     }
 
     public void increaseQuantity(int quantity) {

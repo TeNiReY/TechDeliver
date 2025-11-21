@@ -12,4 +12,5 @@ import lombok.Setter;
 public class AddCategoryRequest {
         private String name;
         private String description;
+        private double installationComplexityCoefficient;
 }
