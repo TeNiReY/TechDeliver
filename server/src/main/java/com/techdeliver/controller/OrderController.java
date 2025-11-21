@@ -36,5 +36,16 @@ public class OrderController {
         return orderService.getConvertedOrders(orders);
     }
 
+    @QueryMapping
+    public List<OrderDto> getAllOrders() {
+        return orderService.getConvertedOrders(orderService.getAllOrders());
+    }
+
+    @MutationMapping
+    public OrderDto updateOrderStatus(@Argument UUID orderId, @Argument String status) {
+        var updatedOrder = orderService.updateOrderStatus(orderId, status);
+        return orderService.convertToDto(updatedOrder);
+    }
+
 
 }

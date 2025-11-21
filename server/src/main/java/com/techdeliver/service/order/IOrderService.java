@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IOrderService {
+    OrderEntity getOrderById(UUID orderId);
+
+    List<OrderEntity> getAllOrders();
+
     OrderInfoDto calculateOrderInfo(PlaceOrderRequest request);
 
     OrderEntity placeOrder(PlaceOrderRequest request);
@@ -18,4 +22,6 @@ public interface IOrderService {
     List<OrderDto> getConvertedOrders(List<OrderEntity> orders);
 
     OrderDto convertToDto(OrderEntity order);
+
+    OrderEntity updateOrderStatus(UUID orderId, String status);
 }

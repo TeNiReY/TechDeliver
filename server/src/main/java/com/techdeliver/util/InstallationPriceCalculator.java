@@ -9,7 +9,7 @@ import java.util.Set;
 @Service
 public class InstallationPriceCalculator {
 
-    private BigDecimal basicInstallationPrice = BigDecimal.valueOf(20);
+    private BigDecimal basicInstallationPrice = BigDecimal.valueOf(20); //make possible to change by admin
 
     public void setBasicInstallationPrice(BigDecimal basicInstallationPrice) {
         this.basicInstallationPrice = basicInstallationPrice;

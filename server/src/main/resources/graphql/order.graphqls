@@ -3,7 +3,7 @@ extend type Query {
 
     getUserOrders(userId: ID!): [OrderDto]
 
-
+    getAllOrders: [OrderDto]
 
 }
 
@@ -12,6 +12,8 @@ extend type Mutation {
     placeOrder(input: PlaceOrderInput!): OrderDto
 
     calculateOrderPreview(input: PlaceOrderInput!): OrderInfoDto
+
+    updateOrderStatus(orderId: ID!, status: String!): OrderDto
 }
 
 input PlaceOrderInput {

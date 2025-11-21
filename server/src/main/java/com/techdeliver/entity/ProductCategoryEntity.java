@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "categories")
-public class ProductCategoryEntity { //TODO: add base delivery price + base installation price
+public class ProductCategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

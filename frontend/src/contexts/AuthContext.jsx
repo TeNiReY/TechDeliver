@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useApolloClient, useLazyQuery } from '@apollo/client';
+import { GET_USER_PROFILE } from '../graphql/queries';
 
 const AuthContext = createContext();
 
@@ -11,9 +13,11 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const apolloClient = useApolloClient();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
 
   // Функция для декодирования JWT токена и получения userId
   const getUserIdFromToken = (token) => {
@@ -26,6 +30,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const [loadUserProfile] = useLazyQuery(GET_USER_PROFILE, {
+    onCompleted: (data) => {
+      if (data?.getUserProfileInfo) {
+        setUserProfile(data.getUserProfileInfo);
+        setUser(prev => ({
+          ...prev,
+          roles: data.getUserProfileInfo.roles
+        }));
+      }
+      setLoading(false);
+    },
+    onError: (error) => {
+      console.error('Error loading user profile:', error);
+      setLoading(false);
+    },
+    fetchPolicy: 'network-only'
+  });
+
   useEffect(() => {
     if (token) {
       // Получаем userId из localStorage или из токена
@@ -37,26 +59,38 @@ export const AuthProvider = ({ children }) => {
         }
       }
       setUser({ token, userId });
+      // Загружаем профиль пользователя для получения ролей
+      loadUserProfile({ variables: { userId } });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [token]);
+  }, [token, loadUserProfile]);
 
   const login = (token, userId) => {
     localStorage.setItem('token', token);
     localStorage.setItem('userId', userId);
     setToken(token);
     setUser({ token, userId });
+    // Загружаем профиль для получения ролей
+    loadUserProfile({ variables: { userId } });
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     setToken(null);
     setUser(null);
+    // Очищаем кеш Apollo при выходе
+    await apolloClient.clearStore();
   };
 
   const isAuthenticated = () => {
     return !!token;
+  };
+
+  const isAdmin = () => {
+    // Проверяем наличие роли ADMIN
+    return user?.roles?.includes('ADMIN') || false;
   };
 
   const value = {
@@ -65,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isAuthenticated,
+    isAdmin,
     loading
   };
 
