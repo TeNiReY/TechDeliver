@@ -1,6 +1,7 @@
 package com.techdeliver.entity;
 
 import com.techdeliver.enums.OrderStatus;
+import com.techdeliver.enums.delivery.DeliveryUrgency;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,12 +21,21 @@ import java.util.UUID;
 public class OrderEntity {
 
     @Id
-//    @Column(name = "order_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
 
     private LocalDate orderDate;
-    private BigDecimal orderTotalAmount;
+    private String deliveryAddress;
+    private double distanceInKM;
+
+    private BigDecimal orderTotalPrice;
+    private BigDecimal orderItemsTotalPrice;
+    private BigDecimal deliveryTotalPrice;
+    private BigDecimal installationPrice;
+
+
+    @Enumerated(EnumType.STRING)
+    private DeliveryUrgency  deliveryUrgency;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
@@ -36,5 +46,9 @@ public class OrderEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    public void calculateOrderTotalPrice() {
+        orderTotalPrice = orderItemsTotalPrice.add(deliveryTotalPrice).add(installationPrice);
+    }
 
 }

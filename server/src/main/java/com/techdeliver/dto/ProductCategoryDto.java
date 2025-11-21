@@ -13,5 +13,6 @@ public class ProductCategoryDto {
     private UUID categoryId;
     private String categoryName;
     private String categoryDescription;
+    private double installationComplexityCoefficient;
     private List<ProductDto> products;
 }

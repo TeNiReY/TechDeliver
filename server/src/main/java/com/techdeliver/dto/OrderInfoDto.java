@@ -1,5 +1,6 @@
 package com.techdeliver.dto;
 
+import com.techdeliver.entity.CartItemEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,21 +11,23 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class OrderDto {
-    private UUID id;
-    private UUID userId;
+public class OrderInfoDto {
 
+    private UUID userId;
     private LocalDate orderDate;
+
     private String deliveryAddress;
-    private double distanceInKM;
+
+    //TODO: поле когда придет заказ.
+
+
 
     private BigDecimal orderTotalPrice;
     private BigDecimal orderItemsTotalPrice;
     private BigDecimal deliveryTotalPrice;
     private BigDecimal installationPrice;
 
-    private String deliveryUrgency;
     private String status;
+    private Set<CartItemEntity> orderItems;
 
-    private Set<OrderItemDto> orderItems;
 }
