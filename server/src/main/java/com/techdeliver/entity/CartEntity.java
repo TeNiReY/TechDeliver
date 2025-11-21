@@ -3,11 +3,9 @@ package com.techdeliver.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Indexed;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,17 +16,17 @@ import java.util.UUID;
 public class CartEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //TODO: change later
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID cartId;
-
-    private UUID userId;
 
     private BigDecimal totalPrice;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItemEntity> cartItems = new HashSet<>();
 
-    //TODO: add user
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public void addItem(CartItemEntity cartItem) {
         this.cartItems.add(cartItem);
@@ -52,5 +50,8 @@ public class CartEntity {
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
+    public void clearCart() {
+        this.cartItems.clear();
+        this.totalPrice = BigDecimal.ZERO;
+    }
 }

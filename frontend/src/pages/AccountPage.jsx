@@ -1,7 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import UpdateUsernameForm from '../components/UpdateUsernameForm'
+import UpdatePasswordForm from '../components/UpdatePasswordForm'
+import CartView from '../components/CartView'
+import OrdersView from '../components/OrdersView'
 
 const sections = [
   { id: 'profile', title: 'Профиль' },
+  { id: 'cart', title: 'Корзина' },
   { id: 'orders', title: 'Мои заказы' },
   { id: 'addresses', title: 'Адреса доставки' },
   { id: 'favorites', title: 'Избранное' },
@@ -10,6 +17,15 @@ const sections = [
 
 const AccountPage = () => {
   const [active, setActive] = useState('profile')
+  const { user, logout } = useAuth()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && sections.some(section => section.id === tab)) {
+      setActive(tab)
+    }
+  }, [searchParams])
 
   const renderContent = () => {
     switch (active) {
@@ -17,16 +33,40 @@ const AccountPage = () => {
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Профиль</h2>
-            <p className="text-gray-600">Здесь появится редактирование профиля и привязка телефона/email.</p>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">ID пользователя</label>
+                  <p className="mt-1 text-sm text-gray-900 font-mono">{user?.userId || 'Не указан'}</p>
+                  {user?.userId && (
+                    <p className="mt-1 text-xs text-gray-500">Тип: {typeof user.userId}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Статус</label>
+                  <p className="mt-1 text-sm text-green-600">Активен</p>
+                </div>
+              </div>
+              
+              <div className="border-t pt-6">
+                <UpdateUsernameForm />
+              </div>
+              
+              <div className="border-t pt-6">
+                <UpdatePasswordForm />
+              </div>
+            </div>
+          </div>
+        )
+      case 'cart':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Корзина</h2>
+            <CartView />
           </div>
         )
       case 'orders':
-        return (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Мои заказы</h2>
-            <div className="rounded-lg border border-gray-200 p-6 text-gray-600">Пока заказов нет.</div>
-          </div>
-        )
+        return <OrdersView />
       case 'addresses':
         return (
           <div>
@@ -45,8 +85,17 @@ const AccountPage = () => {
         return (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Безопасность</h2>
-            <p className="text-gray-600 mb-4">В будущем: вход/выход, смена пароля, JWT, 2FA.</p>
-            <button className="px-5 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white">Войти</button>
+            <div className="space-y-4">
+              <p className="text-gray-600">Управление безопасностью аккаунта.</p>
+              <div className="border-t pt-4">
+                <button 
+                  onClick={logout}
+                  className="px-5 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
+                >
+                  Выйти из аккаунта
+                </button>
+              </div>
+            </div>
           </div>
         )
       default:
