@@ -93,6 +93,12 @@ public class UserController {
         return true;
     }
 
+    @MutationMapping
+    public UserDto blockUser(@Argument UUID userId) {
+        var blockedUser = userService.blockUser(userId);
+        return userService.convertToDto(blockedUser);
+    }
+
     @QueryMapping
     public List<UserDto> getAllUsers() {
         return userService.getConvertedUsers(userService.getAllUsers());

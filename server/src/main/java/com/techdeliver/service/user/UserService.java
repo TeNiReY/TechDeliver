@@ -127,6 +127,18 @@ public class UserService implements IUserService {
         return product;
     }
 
+    @Override
+    public UserEntity blockUser(UUID userId) {
+        return Optional.ofNullable(getUserById(userId))
+                .map(u -> {
+                    u.getRoles().remove(roleRepository.findByName("USER"));
+                    u.getRoles().remove(roleRepository.findByName("ADMIN"));
+                    u.addRole(roleRepository.findByName("BLOCKED"));
+                    return userRepository.save(u);
+                }).orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
 
     @Override
     public List<UserDto> getConvertedUsers(List<UserEntity> users) {
