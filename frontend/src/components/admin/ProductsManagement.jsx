@@ -3,10 +3,13 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_CATEGORIES, ADD_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT } from '../../graphql/queries';
 import ConfirmDialog from '../ConfirmDialog';
 import Toast from '../Toast';
+import ImageUpload from './ImageUpload';
 
 const ProductsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedProductForImages, setSelectedProductForImages] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, productId: null });
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -161,6 +164,15 @@ const ProductsManagement = () => {
     setConfirmDialog({ isOpen: false, productId: null });
   };
 
+  const handleOpenImageModal = (product) => {
+    setSelectedProductForImages(product);
+    setShowImageModal(true);
+  };
+
+  const handleImageUploadSuccess = () => {
+    refetch();
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -190,64 +202,85 @@ const ProductsManagement = () => {
       </div>
 
       {/* Products Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Название</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Бренд</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Категория</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Цена</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Остаток</th>
-              <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Действия</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredProducts.map((product) => (
-              <tr key={product.productId} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.productId}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{product.productName}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.productBrand}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-[#B39CD0]">
-                    {product.categoryName}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                  {parseFloat(product.price || 0).toFixed(2)} Br
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    product.inventory > 10 
-                      ? 'bg-green-100 text-green-800' 
-                      : product.inventory > 0 
-                      ? 'bg-yellow-100 text-yellow-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {product.inventory} шт.
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button 
-                    onClick={() => handleOpenEditModal(product)}
-                    className="text-[#B39CD0] hover:text-[#950740] mr-3 transition-colors"
-                  >
-                    Изменить
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(product.productId)}
-                    className="text-red-600 hover:text-red-800 transition-colors"
-                  >
-                    Удалить
-                  </button>
-                </td>
+      <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">ID</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Название</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Бренд</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Категория</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-28">Цена</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-28">Остаток</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-40">Действия</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredProducts.map((product) => (
+                <tr key={product.productId} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-4 text-sm text-gray-500 font-mono">
+                    <div className="truncate w-20" title={product.productId}>
+                      {product.productId.substring(0, 8)}...
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={product.productName}>
+                      {product.productName}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-500">
+                    <div className="max-w-xs truncate" title={product.productBrand}>
+                      {product.productBrand}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-[#B39CD0] whitespace-nowrap">
+                      {product.categoryName}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                    {parseFloat(product.price || 0).toFixed(2)} Br
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                      product.inventory > 10 
+                        ? 'bg-green-100 text-green-800' 
+                        : product.inventory > 0 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.inventory} шт.
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-right text-sm font-medium whitespace-nowrap">
+                    <button 
+                      onClick={() => handleOpenImageModal(product)}
+                      className="text-blue-600 hover:text-blue-800 mr-3 transition-colors"
+                      title="Управление изображениями"
+                    >
+                      <svg className="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                    <button 
+                      onClick={() => handleOpenEditModal(product)}
+                      className="text-[#B39CD0] hover:text-[#950740] mr-3 transition-colors"
+                    >
+                      Изменить
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(product.productId)}
+                      className="text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      Удалить
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {filteredProducts.length === 0 && (
@@ -382,6 +415,34 @@ const ProductsManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Image Upload Modal */}
+      {showImageModal && selectedProductForImages && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 z-50 flex items-center justify-center p-4" onClick={() => setShowImageModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">Изображения товара</h3>
+                <p className="text-sm text-gray-600 mt-1">{selectedProductForImages.productName}</p>
+              </div>
+              <button 
+                onClick={() => setShowImageModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <ImageUpload
+              productId={selectedProductForImages.productId}
+              existingImages={selectedProductForImages.images || []}
+              onUploadSuccess={handleImageUploadSuccess}
+            />
           </div>
         </div>
       )}

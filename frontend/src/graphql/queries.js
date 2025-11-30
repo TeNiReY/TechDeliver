@@ -72,6 +72,34 @@ export const GET_PRODUCTS_BY_CATEGORY = gql`
   }
 `;
 
+export const GET_PRODUCT_BY_ID = gql`
+  query GetProductById($productId: ID!) {
+    getProductById(productId: $productId) {
+      productId
+      productName
+      price
+      inventory
+      productBrand
+      productModel
+      productWeight
+      productWidth
+      productLength
+      productHeight
+      productDescription
+      productCategory {
+        categoryId
+        categoryName
+        categoryDescription
+      }
+      images {
+        id
+        fileName
+        downloadUrl
+      }
+    }
+  }
+`;
+
 // Auth mutations
 export const LOGIN_MUTATION = gql`
   mutation Login($input: LoginInput!) {
@@ -368,6 +396,26 @@ export const CREATE_CATEGORY = gql`
   }
 `;
 
+export const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory($categoryId: ID!, $input: UpdateCategoryInput!) {
+    updateCategory(categoryId: $categoryId, input: $input) {
+      categoryDto {
+        categoryId
+        categoryName
+        categoryDescription
+        installationComplexityCoefficient
+      }
+      message
+    }
+  }
+`;
+
+export const DELETE_CATEGORY = gql`
+  mutation DeleteCategory($categoryId: ID!) {
+    deleteCategory(categoryId: $categoryId)
+  }
+`;
+
 // Admin - Users
 export const GET_ALL_USERS = gql`
   query GetAllUsers {
@@ -412,6 +460,29 @@ export const UPDATE_ORDER_STATUS = gql`
     updateOrderStatus(orderId: $orderId, status: $status) {
       id
       status
+    }
+  }
+`;
+
+// Admin - User Management
+export const BLOCK_USER = gql`
+  mutation BlockUser($userId: ID!) {
+    blockUser(userId: $userId) {
+      userId
+      username
+      email
+      roles
+    }
+  }
+`;
+
+export const UNBLOCK_USER = gql`
+  mutation UnblockUser($userId: ID!) {
+    unblockUser(userId: $userId) {
+      userId
+      username
+      email
+      roles
     }
   }
 `;

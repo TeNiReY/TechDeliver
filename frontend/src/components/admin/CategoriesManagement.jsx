@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_ALL_CATEGORIES, CREATE_CATEGORY } from '../../graphql/queries';
+import { GET_ALL_CATEGORIES, CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from '../../graphql/queries';
 import Toast from '../Toast';
+import ConfirmDialog from '../ConfirmDialog';
 
 const CategoriesManagement = () => {
   const [showModal, setShowModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [deletingCategory, setDeletingCategory] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +29,30 @@ const CategoriesManagement = () => {
     }
   });
 
+  const [updateCategory, { loading: updating }] = useMutation(UPDATE_CATEGORY, {
+    onCompleted: () => {
+      refetch();
+      setShowModal(false);
+      setEditingCategory(null);
+      resetForm();
+      setToast({ show: true, message: 'Категория успешно обновлена!', type: 'success' });
+    },
+    onError: (error) => {
+      setToast({ show: true, message: 'Ошибка при обновлении категории: ' + error.message, type: 'error' });
+    }
+  });
+
+  const [deleteCategory, { loading: deleting }] = useMutation(DELETE_CATEGORY, {
+    onCompleted: () => {
+      refetch();
+      setDeletingCategory(null);
+      setToast({ show: true, message: 'Категория успешно удалена!', type: 'success' });
+    },
+    onError: (error) => {
+      setToast({ show: true, message: 'Ошибка при удалении категории: ' + error.message, type: 'error' });
+    }
+  });
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -36,15 +63,54 @@ const CategoriesManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createCategory({
-      variables: {
-        input: {
-          name: formData.name,
-          description: formData.description,
-          installationComplexityCoefficient: parseFloat(formData.installationComplexityCoefficient)
+    if (editingCategory) {
+      await updateCategory({
+        variables: {
+          categoryId: editingCategory.categoryId,
+          input: {
+            name: formData.name,
+            description: formData.description,
+            installationComplexityCoefficient: parseFloat(formData.installationComplexityCoefficient)
+          }
         }
-      }
+      });
+    } else {
+      await createCategory({
+        variables: {
+          input: {
+            name: formData.name,
+            description: formData.description,
+            installationComplexityCoefficient: parseFloat(formData.installationComplexityCoefficient)
+          }
+        }
+      });
+    }
+  };
+
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.categoryName,
+      description: category.categoryDescription || '',
+      installationComplexityCoefficient: category.installationComplexityCoefficient?.toString() || '1.0'
     });
+    setShowModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (deletingCategory) {
+      await deleteCategory({
+        variables: {
+          categoryId: deletingCategory.categoryId
+        }
+      });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingCategory(null);
+    resetForm();
   };
 
   const categories = data?.getAllCategories?.categories || [];
@@ -96,10 +162,16 @@ const CategoriesManagement = () => {
               </div>
             </div>
             <div className="flex space-x-2 pt-4 border-t border-purple-200">
-              <button className="flex-1 px-4 py-2 bg-white text-[#B39CD0] rounded-lg font-semibold hover:bg-[#B39CD0] hover:text-white transition-all">
+              <button 
+                onClick={() => handleEdit(category)}
+                className="flex-1 px-4 py-2 bg-white text-[#B39CD0] rounded-lg font-semibold hover:bg-[#B39CD0] hover:text-white transition-all"
+              >
                 Изменить
               </button>
-              <button className="flex-1 px-4 py-2 bg-white text-red-600 rounded-lg font-semibold hover:bg-red-600 hover:text-white transition-all">
+              <button 
+                onClick={() => setDeletingCategory(category)}
+                className="flex-1 px-4 py-2 bg-white text-red-600 rounded-lg font-semibold hover:bg-red-600 hover:text-white transition-all"
+              >
                 Удалить
               </button>
             </div>
@@ -115,12 +187,14 @@ const CategoriesManagement = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 z-50 flex items-center justify-center p-4" onClick={handleCloseModal}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Добавить категорию</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {editingCategory ? 'Редактировать категорию' : 'Добавить категорию'}
+              </h3>
               <button 
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,19 +239,22 @@ const CategoriesManagement = () => {
               <div className="flex space-x-3 pt-4">
                 <button
                   type="submit"
-                  disabled={creating}
+                  disabled={creating || updating}
                   className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
-                    creating
+                    creating || updating
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : 'bg-gradient-to-r from-[#950740] to-[#B39CD0] text-white hover:shadow-lg'
                   }`}
                 >
-                  {creating ? 'Создание...' : 'Создать категорию'}
+                  {creating || updating 
+                    ? (editingCategory ? 'Обновление...' : 'Создание...') 
+                    : (editingCategory ? 'Обновить' : 'Создать категорию')
+                  }
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  disabled={creating}
+                  onClick={handleCloseModal}
+                  disabled={creating || updating}
                   className="flex-1 py-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
                 >
                   Отмена
@@ -187,6 +264,18 @@ const CategoriesManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={!!deletingCategory}
+        title="Удалить категорию?"
+        message={deletingCategory ? `Вы уверены, что хотите удалить категорию "${deletingCategory.categoryName}"? Это действие нельзя отменить.` : ''}
+        confirmText="Удалить"
+        cancelText="Отмена"
+        onConfirm={handleDelete}
+        onClose={() => setDeletingCategory(null)}
+        type="danger"
+      />
 
       {/* Toast */}
       {toast.show && (
