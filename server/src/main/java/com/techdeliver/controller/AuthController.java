@@ -2,6 +2,7 @@ package com.techdeliver.controller;
 
 import com.techdeliver.request.LoginRequest;
 import com.techdeliver.security.jwt.JwtUtils;
+import com.techdeliver.security.permission.ExcludeRole;
 import com.techdeliver.security.user.ShopUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -22,6 +23,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     @MutationMapping
+    @ExcludeRole("BLOCKED")
     public AuthResponse login(@Argument LoginRequest input)  {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(input.getUsername(), input.getPassword()));

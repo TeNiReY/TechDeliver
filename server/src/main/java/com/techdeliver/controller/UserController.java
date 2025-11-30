@@ -4,6 +4,7 @@ import com.techdeliver.dto.ProductDto;
 import com.techdeliver.dto.UserDto;
 import com.techdeliver.entity.ProductEntity;
 import com.techdeliver.request.RegisterRequest;
+import com.techdeliver.security.permission.RequireRole;
 import com.techdeliver.service.product.IProductService;
 import com.techdeliver.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -31,18 +32,21 @@ public class UserController {
     }
 
     @QueryMapping
+    @RequireRole({"ADMIN", "USER"})
     public UserDto getUserProfileInfo(@Argument UUID userId) {
         var user =  userService.getUserById(userId);
         return userService.convertToDto(user);
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public UserDto updateUsername(@Argument UUID userId, @Argument String newUsername) {
         var updatedUser = userService.updateUsername(userId, newUsername);
         return userService.convertToDto(updatedUser);
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public UserDto updateUserPassword(@Argument UUID userId,
                                   @Argument String oldPass,
                                   @Argument String newPass
@@ -52,17 +56,20 @@ public class UserController {
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public boolean setDeliveryAddress(@Argument UUID userId, @Argument String address) {
         return userService.setDeliveryAddress(userId, address);
     }
 
     @QueryMapping
+    @RequireRole({"ADMIN", "USER"})
     public String getUserDeliveryAddress(@Argument UUID userId) {
         var user = userService.getUserById(userId);
         return user.getSavedDeliveryAddress();
     }
 
     @QueryMapping
+    @RequireRole({"ADMIN", "USER"})
     public Set<ProductDto> getUserSavedProducts(@Argument UUID userId) {
         Set<ProductEntity> savedProducts = userService.getUserSavedProducts(userId);
         return savedProducts.stream()
@@ -71,14 +78,14 @@ public class UserController {
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public ProductDto saveProduct(@Argument UUID productId, @Argument UUID userId) {
-
         var savedProduct = userService.saveProduct(productId, userId);
-
         return productService.convertToDto(savedProduct);
     }
 
     @QueryMapping
+    @RequireRole({"ADMIN", "USER"})
     public List<String> getSavedProductsIds(@Argument UUID userId) {
         var savedProducts = userService.getUserSavedProducts(userId);
         return savedProducts.stream()
@@ -88,12 +95,14 @@ public class UserController {
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public boolean unsaveProduct(@Argument UUID productId, @Argument UUID userId) {
         var unsavedProduct = userService.unsaveProduct(productId, userId);
         return true;
     }
 
     @MutationMapping
+    @RequireRole("ADMIN")
     public UserDto blockUser(@Argument UUID userId) {
         var blockedUser = userService.blockUser(userId);
         return userService.convertToDto(blockedUser);
