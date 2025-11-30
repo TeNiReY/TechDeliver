@@ -30,6 +30,8 @@ public interface IUserService {
 
     UserEntity blockUser(UUID userId);
 
+    UserEntity unblockUser(UUID userId);
+
     List<UserDto> getConvertedUsers(List<UserEntity> users);
 
     UserDto convertToDto(UserEntity cart);

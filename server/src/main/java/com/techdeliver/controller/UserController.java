@@ -108,6 +108,13 @@ public class UserController {
         return userService.convertToDto(blockedUser);
     }
 
+    @MutationMapping
+    @RequireRole("ADMIN")
+    public UserDto unblockUser(@Argument UUID userId) {
+        var blockedUser = userService.unblockUser(userId);
+        return userService.convertToDto(blockedUser);
+    }
+
     @QueryMapping
     public List<UserDto> getAllUsers() {
         return userService.getConvertedUsers(userService.getAllUsers());

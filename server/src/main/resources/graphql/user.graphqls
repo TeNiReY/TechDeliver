@@ -27,6 +27,8 @@ extend type Mutation {
     unsaveProduct(productId: ID!, userId: ID!): Boolean
 
     blockUser(userId: ID!): UserDto
+
+    unblockUser(userId: ID!): UserDto
 }
 
 type UserDto {
