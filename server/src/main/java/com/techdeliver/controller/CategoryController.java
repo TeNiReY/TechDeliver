@@ -2,6 +2,7 @@ package com.techdeliver.controller;
 
 import com.techdeliver.dto.ProductCategoryDto;
 import com.techdeliver.request.AddCategoryRequest;
+import com.techdeliver.request.UpdateCategoryRequest;
 import com.techdeliver.security.permission.RequireRole;
 import com.techdeliver.service.category.IProductCategoryService;
 import com.techdeliver.service.category.ProductCategoryService;
@@ -48,6 +49,20 @@ public class CategoryController {
         return new CategoryResponse(
                 productCategoryService.convertToDto(createdCategory),
                 "Create category success!");
+    }
+
+    @MutationMapping
+    public CategoryResponse updateCategory(@Argument UUID categoryId, @Argument UpdateCategoryRequest input) {
+        var updatedCategory = categoryService.updateCategory(categoryId, input);
+        return new CategoryResponse(
+                productCategoryService.convertToDto(updatedCategory),
+                "Create updated successfully!");
+    }
+
+    @MutationMapping
+    public boolean deleteCategory(@Argument UUID categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return true; //TODO: think what to return here
     }
 
     public record CategoryResponse(ProductCategoryDto categoryDto,

@@ -7,6 +7,7 @@ import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.ResourceNotFoundException;
 import com.techdeliver.repository.ProductCategoryRepository;
 import com.techdeliver.request.AddCategoryRequest;
+import com.techdeliver.request.UpdateCategoryRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,23 @@ public class ProductCategoryService implements IProductCategoryService {
     public ProductCategoryEntity addCategory(String categoryName) { //TODO: maybe should throws exceptions
         var category = new ProductCategoryEntity(categoryName);
         return categoryRepository.save(category);
+    }
+
+    @Override
+    public ProductCategoryEntity updateCategory(UUID categoryId, UpdateCategoryRequest request) {
+        return Optional.ofNullable(getCategoryById(categoryId))
+                .map(c -> {
+                    c.setCategoryName(request.getName());
+                    c.setCategoryDescription(request.getDescription());
+                    c.setInstallationComplexityCoefficient(request.getInstallationComplexityCoefficient());
+                    return categoryRepository.save(c);
+                }).orElseThrow(() ->
+                        new ResourceNotFoundException("Категория с id "+ categoryId + "не найдена."));
+    }
+
+    @Override
+    public void deleteCategory(UUID categoryId) {
+        categoryRepository.deleteById(categoryId);
     }
 
     @Override
