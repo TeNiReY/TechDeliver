@@ -109,14 +109,39 @@ const ProductCard = ({ product, onRemove }) => {
     }
   }
 
+  const handleCardClick = () => {
+    window.location.href = `/product/${product.productId}`;
+  };
+
   return (
-    <div className="product-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-[#B39CD0]">
+    <div 
+      onClick={handleCardClick}
+      className="product-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-[#B39CD0] cursor-pointer"
+    >
       <div className="relative">
-        <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center h-56 sm:h-60 lg:h-64 rounded-t-lg">
-          <svg className="w-20 h-20 sm:w-24 sm:h-24 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
+        {product.images && product.images.length > 0 ? (
+          <div className="h-56 sm:h-60 lg:h-64 rounded-t-lg overflow-hidden relative">
+            <img
+              src={product.images[0].downloadUrl}
+              alt={product.productName}
+              className="w-full h-full object-cover"
+            />
+            {product.images.length > 1 && (
+              <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>{product.images.length}</span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center h-56 sm:h-60 lg:h-64 rounded-t-lg">
+            <svg className="w-20 h-20 sm:w-24 sm:h-24 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+        )}
         
         {/* Кнопка избранного */}
         <button
@@ -177,7 +202,10 @@ const ProductCard = ({ product, onRemove }) => {
         </div>
 
         <button 
-          onClick={handleAddToCart}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCart();
+          }}
           className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
             isInStock && !isAdding
               ? 'bg-[#B39CD0] text-white hover:bg-[#9575CD] hover:shadow-lg hover:-translate-y-0.5'

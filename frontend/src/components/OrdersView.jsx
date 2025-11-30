@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const OrdersView = () => {
   const { user } = useAuth();
+  const [statusFilter, setStatusFilter] = React.useState('all');
   
   const { data, loading, error } = useQuery(GET_USER_ORDERS, {
     variables: { userId: user?.userId },
@@ -96,9 +97,30 @@ const OrdersView = () => {
     );
   }
 
-  const orders = data?.getUserOrders || [];
+  const allOrders = data?.getUserOrders || [];
+  
+  // Фильтрация заказов по статусу
+  const orders = statusFilter === 'all' 
+    ? allOrders 
+    : allOrders.filter(order => {
+        if (statusFilter === 'completed') {
+          return order.status?.toLowerCase() === 'delivered';
+        }
+        if (statusFilter === 'active') {
+          return ['pending', 'processing', 'shipped'].includes(order.status?.toLowerCase());
+        }
+        return order.status?.toLowerCase() === statusFilter;
+      });
 
-  if (orders.length === 0) {
+  // Подсчет заказов по статусам
+  const statusCounts = {
+    all: allOrders.length,
+    active: allOrders.filter(o => ['pending', 'processing', 'shipped'].includes(o.status?.toLowerCase())).length,
+    completed: allOrders.filter(o => o.status?.toLowerCase() === 'delivered').length,
+    cancelled: allOrders.filter(o => o.status?.toLowerCase() === 'cancelled').length,
+  };
+
+  if (allOrders.length === 0) {
     return (
       <div className="text-center py-16">
         <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -122,7 +144,7 @@ const OrdersView = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-[#950740] to-[#B39CD0] bg-clip-text text-transparent">
             Мои заказы
@@ -134,10 +156,71 @@ const OrdersView = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="text-sm font-semibold text-gray-700">
-            Всего: {orders.length}
+            Показано: {orders.length} из {allOrders.length}
           </span>
         </div>
       </div>
+
+      {/* Фильтры по статусу */}
+      <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              statusFilter === 'all'
+                ? 'bg-gradient-to-r from-[#950740] to-[#B39CD0] text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Все ({statusCounts.all})
+          </button>
+          <button
+            onClick={() => setStatusFilter('active')}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              statusFilter === 'active'
+                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Активные ({statusCounts.active})
+          </button>
+          <button
+            onClick={() => setStatusFilter('completed')}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              statusFilter === 'completed'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Завершенные ({statusCounts.completed})
+          </button>
+          <button
+            onClick={() => setStatusFilter('cancelled')}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              statusFilter === 'cancelled'
+                ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Отмененные ({statusCounts.cancelled})
+          </button>
+        </div>
+      </div>
+
+      {/* Сообщение если нет заказов с выбранным фильтром */}
+      {orders.length === 0 && allOrders.length > 0 && (
+        <div className="text-center py-12 bg-white rounded-xl shadow-md">
+          <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-[#950740]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            Заказов с таким статусом не найдено
+          </h3>
+          <p className="text-gray-600">Попробуйте выбрать другой фильтр</p>
+        </div>
+      )}
 
       <div className="space-y-5">
         {orders.map((order) => (

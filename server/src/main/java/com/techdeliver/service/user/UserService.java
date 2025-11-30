@@ -52,7 +52,7 @@ public class UserService implements IUserService {
                     userEntity.setUsername(request.getUsername());
                     userEntity.setEmail(request.getEmail());
                     userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-                    userEntity.addRole(roleRepository.findByName("USER"));
+                    userEntity.addRole(roleRepository.findByName("ROLE_USER"));
                     return userRepository.save(userEntity);
                 }).orElseThrow(() ->
                         new AlreadyExistsException("User with the same credentials already exists!"));
@@ -126,6 +126,32 @@ public class UserService implements IUserService {
         userRepository.save(user);
         return product;
     }
+
+    @Override
+    public UserEntity blockUser(UUID userId) {
+        return Optional.ofNullable(getUserById(userId))
+                .map(u -> {
+//                    u.getRoles().remove(roleRepository.findByName("ROLE_USER"));
+//                    u.getRoles().remove(roleRepository.findByName("ROLE_ADMIN"));
+                    u.addRole(roleRepository.findByName("ROLE_BLOCKED"));
+                    return userRepository.save(u);
+                }).orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
+    @Override
+    public UserEntity unblockUser(UUID userId) {
+        return Optional.ofNullable(getUserById(userId))
+                .map(u -> {
+//                    u.getRoles().remove(roleRepository.findByName("ROLE_USER"));
+                    u.getRoles().remove(roleRepository.findByName("ROLE_BLOCKED"));
+//                    u.addRole(roleRepository.findByName("ROLE_BLOCKED"));
+                    return userRepository.save(u);
+                }).orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
+
 
 
     @Override

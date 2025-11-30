@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequireRole {
     String[] value();  // массив ролей, например {"ADMIN", "MANAGER"}
+    
+    RoleCheckMode mode() default RoleCheckMode.ANY;  // режим проверки
 }

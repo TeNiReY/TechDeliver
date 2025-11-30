@@ -28,6 +28,10 @@ public interface IUserService {
 
     ProductEntity unsaveProduct(UUID productId, UUID userId);
 
+    UserEntity blockUser(UUID userId);
+
+    UserEntity unblockUser(UUID userId);
+
     List<UserDto> getConvertedUsers(List<UserEntity> users);
 
     UserDto convertToDto(UserEntity cart);

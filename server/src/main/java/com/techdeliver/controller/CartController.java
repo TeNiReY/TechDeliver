@@ -1,6 +1,7 @@
 package com.techdeliver.controller;
 
 import com.techdeliver.dto.CartDto;
+import com.techdeliver.security.permission.RequireRole;
 import com.techdeliver.service.cart.ICartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -17,12 +18,14 @@ public class CartController {
     private final ICartService cartService;
 
     @QueryMapping
+    @RequireRole({"ADMIN", "USER"})
     public CartDto getCart(@Argument UUID userId) {
         var cart = cartService.getCartByUserId(userId);
         return cartService.convertToDto(cart);
     }
 
-    @MutationMapping //TODO: check this 3 methods
+    @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public CartResponse addItemToCart(@Argument UUID userId,
                                       @Argument UUID productId,
                                       @Argument int quantity
@@ -32,6 +35,7 @@ public class CartController {
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public CartResponse removeItemFromCart(@Argument UUID userId,
                                       @Argument UUID productId
     ) {
@@ -40,6 +44,7 @@ public class CartController {
     }
 
     @MutationMapping
+    @RequireRole({"ADMIN", "USER"})
     public CartResponse updateItemQuantity(@Argument UUID userId,
                                       @Argument UUID productId,
                                       @Argument int newQuantity

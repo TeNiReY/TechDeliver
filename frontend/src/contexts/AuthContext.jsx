@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState(null);
 
   // Функция для декодирования JWT токена и получения userId
   const getUserIdFromToken = (token) => {
@@ -33,7 +32,6 @@ export const AuthProvider = ({ children }) => {
   const [loadUserProfile] = useLazyQuery(GET_USER_PROFILE, {
     onCompleted: (data) => {
       if (data?.getUserProfileInfo) {
-        setUserProfile(data.getUserProfileInfo);
         setUser(prev => ({
           ...prev,
           roles: data.getUserProfileInfo.roles
@@ -88,9 +86,18 @@ export const AuthProvider = ({ children }) => {
     return !!token;
   };
 
+  const hasRole = (roleName) => {
+    // Проверяем наличие роли (с префиксом ROLE_ или без)
+    if (!user?.roles) return false;
+    return user.roles.some(role => 
+      role === roleName || 
+      role === `ROLE_${roleName}` ||
+      role.replace('ROLE_', '') === roleName
+    );
+  };
+
   const isAdmin = () => {
-    // Проверяем наличие роли ADMIN
-    return user?.roles?.includes('ADMIN') || false;
+    return hasRole('ADMIN');
   };
 
   const value = {
@@ -100,6 +107,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated,
     isAdmin,
+    hasRole,
     loading
   };
 

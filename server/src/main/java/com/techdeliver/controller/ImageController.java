@@ -3,6 +3,7 @@ package com.techdeliver.controller;
 import com.techdeliver.dto.ImageDto;
 import com.techdeliver.entity.ImageEntity;
 import com.techdeliver.exception.ResourceNotFoundException;
+import com.techdeliver.security.permission.RequireRole;
 import com.techdeliver.service.image.IImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,6 +25,7 @@ public class ImageController { //TODO: improve
     private final IImageService imageService;
 
     @PostMapping("/upload")
+    @RequireRole("ADMIN")
     public ResponseEntity<ImageResponse> uploadImages(
             @RequestParam List<MultipartFile> files,
             @RequestParam UUID productId) {
@@ -59,6 +61,7 @@ public class ImageController { //TODO: improve
     }
 
     @PutMapping("/{imageId}/update")
+    @RequireRole("ADMIN")
     public ResponseEntity<ImageResponse> updateImage(
             @PathVariable Long imageId,
             @RequestParam MultipartFile file) {
@@ -82,6 +85,7 @@ public class ImageController { //TODO: improve
     }
 
     @DeleteMapping("/{imageId}/delete")
+    @RequireRole("ADMIN")
     public ResponseEntity<ImageResponse> deleteImage(@PathVariable Long imageId) {
         try {
             ImageEntity image = imageService.getImageById(imageId);
