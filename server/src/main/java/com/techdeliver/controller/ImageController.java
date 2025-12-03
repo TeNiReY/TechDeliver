@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/images")
-public class ImageController { //TODO: improve
+public class ImageController {
     private final IImageService imageService;
 
     @PostMapping("/upload")
@@ -44,6 +45,7 @@ public class ImageController { //TODO: improve
     }
 
     @GetMapping("/download/{imageId}")
+    @Transactional(readOnly = true)
     public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) throws SQLException {
         try {
             ImageEntity image = imageService.getImageById(imageId);
@@ -53,7 +55,7 @@ public class ImageController { //TODO: improve
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(image.getFileType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + image.getFileName() + "\"")
+                            "inline; filename=\"" + image.getFileName() + "\"")
                     .body(resource);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(404).build();

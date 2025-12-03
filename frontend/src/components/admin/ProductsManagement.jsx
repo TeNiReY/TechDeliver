@@ -442,6 +442,7 @@ const ProductsManagement = () => {
               productId={selectedProductForImages.productId}
               existingImages={selectedProductForImages.images || []}
               onUploadSuccess={handleImageUploadSuccess}
+              onClose={() => setShowImageModal(false)}
             />
           </div>
         </div>

@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // Публичные endpoints
                         .requestMatchers("/graphql").permitAll()  // GraphQL доступен всем
+                        .requestMatchers("/api/v1/images/download/**").permitAll()  // Изображения доступны всем
 
                         // Всё остальное требует аутентификацию
                         .anyRequest().authenticated()

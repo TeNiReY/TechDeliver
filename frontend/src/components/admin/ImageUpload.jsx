@@ -1,13 +1,22 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import Toast from '../Toast';
+import ConfirmDialog from '../ConfirmDialog';
 
-const ImageUpload = ({ productId, existingImages = [], onUploadSuccess }) => {
+const ImageUpload = ({ productId, existingImages = [], onUploadSuccess, onClose }) => {
   const { token } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [localImages, setLocalImages] = useState(existingImages);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+  // Синхронизируем локальное состояние с пропсами
+  if (existingImages !== localImages && existingImages.length !== localImages.length) {
+    setLocalImages(existingImages);
+  }
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -60,9 +69,14 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess }) => {
     }
   };
 
-  const handleDeleteImage = async (imageId) => {
+  const handleDeleteImage = async () => {
+    if (!confirmDeleteId) return;
+    
+    setDeletingImageId(confirmDeleteId);
+    setConfirmDeleteId(null);
+    
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/images/${imageId}/delete`, {
+      const response = await fetch(`http://localhost:8080/api/v1/images/${confirmDeleteId}/delete`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -72,15 +86,23 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess }) => {
       const data = await response.json();
 
       if (response.ok) {
+        // Обновляем локальное состояние сразу
+        setLocalImages(prev => prev.filter(img => img.id !== confirmDeleteId));
         setToast({ show: true, message: 'Изображение удалено!', type: 'success' });
         if (onUploadSuccess) {
           onUploadSuccess();
+        }
+        // Закрываем модальное окно после удаления
+        if (onClose) {
+          setTimeout(() => onClose(), 500);
         }
       } else {
         setToast({ show: true, message: data.message || 'Ошибка удаления', type: 'error' });
       }
     } catch (error) {
       setToast({ show: true, message: 'Ошибка удаления: ' + error.message, type: 'error' });
+    } finally {
+      setDeletingImageId(null);
     }
   };
 
@@ -93,25 +115,36 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess }) => {
   return (
     <div className="space-y-4">
       {/* Existing Images */}
-      {existingImages && existingImages.length > 0 && (
+      {localImages && localImages.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">Текущие изображения</h4>
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-semibold text-gray-700">Текущие изображения ({localImages.length})</h4>
+          </div>
           <div className="grid grid-cols-3 gap-3">
-            {existingImages.map((image) => (
+            {localImages.map((image) => (
               <div key={image.id} className="relative group">
                 <img
                   src={image.downloadUrl}
                   alt={image.fileName}
-                  className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                  className={`w-full h-24 object-cover rounded-lg border border-gray-200 transition-opacity ${
+                    deletingImageId === image.id ? 'opacity-50' : ''
+                  }`}
                 />
-                <button
-                  onClick={() => handleDeleteImage(image.id)}
-                  className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                {deletingImageId === image.id ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDeleteId(image.id)}
+                    className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg"
+                    title="Удалить изображение"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -191,6 +224,18 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess }) => {
           {uploading ? 'Загрузка...' : `Загрузить ${selectedFiles.length} файл(ов)`}
         </button>
       )}
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmDeleteId}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={handleDeleteImage}
+        title="Удалить изображение?"
+        message="Вы уверены, что хотите удалить это изображение? Это действие нельзя отменить."
+        confirmText="Удалить"
+        cancelText="Отмена"
+        type="danger"
+      />
 
       {/* Toast */}
       {toast.show && (

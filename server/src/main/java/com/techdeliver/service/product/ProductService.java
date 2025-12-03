@@ -142,7 +142,14 @@ public class ProductService implements IProductService {
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
         List<ImageEntity> images = imageRepository.findByProductProductId(product.getProductId());
         List<ImageDto> imageDtos = images.stream()
-                .map(image -> modelMapper.map(image, ImageDto.class))
+                .map(image -> {
+                    ImageDto dto = new ImageDto();
+                    dto.setId(image.getId());
+                    dto.setFileName(image.getFileName());
+                    // Всегда формируем правильный URL
+                    dto.setDownloadUrl("http://localhost:8080/api/v1/images/download/" + image.getId());
+                    return dto;
+                })
                 .toList();
         productDto.setImages(imageDtos);
         return productDto;

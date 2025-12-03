@@ -1,10 +1,12 @@
 package com.techdeliver.service.category;
 
+import com.techdeliver.dto.ImageDto;
 import com.techdeliver.dto.ProductCategoryDto;
 import com.techdeliver.dto.ProductDto;
 import com.techdeliver.entity.ProductCategoryEntity;
 import com.techdeliver.exception.AlreadyExistsException;
 import com.techdeliver.exception.ResourceNotFoundException;
+import com.techdeliver.repository.ImageRepository;
 import com.techdeliver.repository.ProductCategoryRepository;
 import com.techdeliver.request.AddCategoryRequest;
 import com.techdeliver.request.UpdateCategoryRequest;
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class ProductCategoryService implements IProductCategoryService {
 
     private final ProductCategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
 
     private final ModelMapper modelMapper;
 
@@ -94,7 +97,22 @@ public class ProductCategoryService implements IProductCategoryService {
 
         List<ProductDto> productDtos = category.getProducts()
                 .stream()
-                .map(p -> modelMapper.map(p, ProductDto.class)).toList();
+                .map(p -> {
+                    ProductDto dto = modelMapper.map(p, ProductDto.class);
+                    // Добавляем изображения
+                    List<ImageDto> imageDtos = imageRepository.findByProductProductId(p.getProductId())
+                            .stream()
+                            .map(image -> {
+                                ImageDto imageDto = new ImageDto();
+                                imageDto.setId(image.getId());
+                                imageDto.setFileName(image.getFileName());
+                                imageDto.setDownloadUrl("http://localhost:8080/api/v1/images/download/" + image.getId());
+                                return imageDto;
+                            })
+                            .toList();
+                    dto.setImages(imageDtos);
+                    return dto;
+                }).toList();
 
         categoryDto.setProducts(productDtos);
         return categoryDto;

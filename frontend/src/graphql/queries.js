@@ -15,6 +15,11 @@ export const GET_ALL_CATEGORIES = gql`
           productBrand
           productModel
           productDescription
+          images {
+            id
+            fileName
+            downloadUrl
+          }
         }
       }
       message
