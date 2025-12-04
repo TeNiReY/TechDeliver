@@ -42,7 +42,8 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess, onClose 
     formData.append('productId', productId);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/images/upload', {
+      const apiBase = import.meta.env.VITE_API_BASE || '';
+      const response = await fetch(`${apiBase}/api/v1/images/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -76,7 +77,8 @@ const ImageUpload = ({ productId, existingImages = [], onUploadSuccess, onClose 
     setConfirmDeleteId(null);
     
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/images/${confirmDeleteId}/delete`, {
+      const apiBase = import.meta.env.VITE_API_BASE || '';
+      const response = await fetch(`${apiBase}/api/v1/images/${confirmDeleteId}/delete`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

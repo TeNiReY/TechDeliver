@@ -106,7 +106,7 @@ public class ProductCategoryService implements IProductCategoryService {
                                 ImageDto imageDto = new ImageDto();
                                 imageDto.setId(image.getId());
                                 imageDto.setFileName(image.getFileName());
-                                imageDto.setDownloadUrl("http://localhost:8080/api/v1/images/download/" + image.getId());
+                                imageDto.setDownloadUrl("/api/v1/images/download/" + image.getId());
                                 return imageDto;
                             })
                             .toList();

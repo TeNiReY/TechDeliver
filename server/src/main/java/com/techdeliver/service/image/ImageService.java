@@ -53,7 +53,7 @@ public class ImageService implements IImageService {
 
                 ImageEntity savedImage = imageRepository.save(image);
 
-                String buildDownloadUrl = "http://localhost:8080/api/v1/images/download/";
+                String buildDownloadUrl = "/api/v1/images/download/";
                 savedImage.setDownloadUrl(buildDownloadUrl + savedImage.getId());
                 imageRepository.save(savedImage);
 
