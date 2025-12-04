@@ -51,11 +51,9 @@ public class ImageService implements IImageService {
                 image.setImage(new SerialBlob(file.getBytes()));
                 image.setProduct(product);
 
-                String buildDownloadUrl = "/api/v1/images/image/download/";
-                String downloadUrl = buildDownloadUrl + image.getId();
-                image.setDownloadUrl(downloadUrl);
                 ImageEntity savedImage = imageRepository.save(image);
 
+                String buildDownloadUrl = "/api/v1/images/download/";
                 savedImage.setDownloadUrl(buildDownloadUrl + savedImage.getId());
                 imageRepository.save(savedImage);
 

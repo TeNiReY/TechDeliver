@@ -9,6 +9,7 @@ const ProductCard = ({ product, onRemove }) => {
   const { isSaved, toggleFavorite } = useFavorites();
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const saved = isSaved(product.productId);
 
@@ -118,21 +119,59 @@ const ProductCard = ({ product, onRemove }) => {
       onClick={handleCardClick}
       className="product-card bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-[#B39CD0] cursor-pointer"
     >
-      <div className="relative">
+      <div className="relative group">
         {product.images && product.images.length > 0 ? (
           <div className="h-56 sm:h-60 lg:h-64 rounded-t-lg overflow-hidden relative">
             <img
-              src={product.images[0].downloadUrl}
+              src={product.images[currentImageIndex].downloadUrl}
               alt={product.productName}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-opacity duration-300"
             />
+            
+            {/* Navigation Arrows - показываются при наведении */}
             {product.images.length > 1 && (
-              <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>{product.images.length}</span>
-              </div>
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1);
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                >
+                  <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                >
+                  <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                
+                {/* Dots indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1.5 z-10">
+                  {product.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(index);
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        currentImageIndex === index
+                          ? 'bg-white w-4'
+                          : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         ) : (

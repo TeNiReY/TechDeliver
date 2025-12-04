@@ -13,6 +13,7 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data, loading, error } = useQuery(GET_PRODUCT_BY_ID, {
     variables: { productId },
@@ -177,38 +178,88 @@ const ProductDetailPage = () => {
         {/* Product Details */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-10">
-            {/* Product Image */}
+            {/* Product Image Gallery */}
             <div className="relative">
               {product.images && product.images.length > 0 ? (
-                <div className="rounded-xl overflow-hidden h-96 lg:h-full">
-                  <img
-                    src={product.images[0].downloadUrl}
-                    alt={product.productName}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="space-y-4">
+                  {/* Main Image */}
+                  <div className="relative rounded-xl overflow-hidden h-96 lg:h-[500px] bg-gray-100">
+                    <img
+                      src={product.images[currentImageIndex].downloadUrl}
+                      alt={product.productName}
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Navigation Arrows */}
+                    {product.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1)}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all"
+                        >
+                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full flex items-center justify-center shadow-lg transition-all"
+                        >
+                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+
+                    {/* Image Counter */}
+                    {product.images.length > 1 && (
+                      <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {currentImageIndex + 1} / {product.images.length}
+                      </div>
+                    )}
+
+                    {/* Stock Badge */}
+                    {!isInStock && (
+                      <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                        Нет в наличии
+                      </div>
+                    )}
+                    {isInStock && product.inventory < 5 && (
+                      <div className="absolute top-4 left-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                        Осталось {product.inventory} шт.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Thumbnails */}
                   {product.images.length > 1 && (
-                    <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                      +{product.images.length - 1} фото
+                    <div className="flex space-x-3 overflow-x-auto pb-2">
+                      {product.images.map((image, index) => (
+                        <button
+                          key={image.id}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                            currentImageIndex === index
+                              ? 'border-[#B39CD0] ring-2 ring-[#B39CD0] ring-opacity-50'
+                              : 'border-gray-200 hover:border-gray-400'
+                          }`}
+                        >
+                          <img
+                            src={image.downloadUrl}
+                            alt={`${product.productName} - ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center h-96 lg:h-full">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center h-96 lg:h-[500px]">
                   <svg className="w-32 h-32 text-[#B39CD0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                </div>
-              )}
-              
-              {/* Stock Badge */}
-              {!isInStock && (
-                <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                  Нет в наличии
-                </div>
-              )}
-              {isInStock && product.inventory < 5 && (
-                <div className="absolute top-4 left-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                  Осталось {product.inventory} шт.
                 </div>
               )}
             </div>
