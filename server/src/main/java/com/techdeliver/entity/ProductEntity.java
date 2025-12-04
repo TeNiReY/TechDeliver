@@ -22,7 +22,7 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID productId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private ProductCategoryEntity productCategory;
 

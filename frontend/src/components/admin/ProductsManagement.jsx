@@ -309,34 +309,70 @@ const ProductsManagement = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Название товара *</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
-                    required
-                    disabled={editingProduct}
-                  />
-                </div>
+                {/* Поля только для добавления нового товара */}
+                {!editingProduct && (
+                  <>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Название товара *</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
+                        required
+                      />
+                    </div>
 
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Категория *</label>
-                  <select
-                    value={formData.categoryNameOrId}
-                    onChange={(e) => setFormData({...formData, categoryNameOrId: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
-                    required
-                    disabled={editingProduct}
-                  >
-                    <option value="">Выберите категорию</option>
-                    {categories.map(cat => (
-                      <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
-                    ))}
-                  </select>
-                </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Категория *</label>
+                      <select
+                        value={formData.categoryNameOrId}
+                        onChange={(e) => setFormData({...formData, categoryNameOrId: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
+                        required
+                      >
+                        <option value="">Выберите категорию</option>
+                        {categories.map(cat => (
+                          <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
+                        ))}
+                      </select>
+                    </div>
 
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Бренд</label>
+                      <input
+                        type="text"
+                        value={formData.brand}
+                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Модель</label>
+                      <input
+                        type="text"
+                        value={formData.model}
+                        onChange={(e) => setFormData({...formData, model: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Информация о товаре при редактировании */}
+                {editingProduct && (
+                  <div className="col-span-2 bg-gray-50 rounded-lg p-4 mb-2">
+                    <h4 className="font-medium text-gray-900 mb-2">{editingProduct.productName}</h4>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p>Бренд: {editingProduct.productBrand || '—'}</p>
+                      <p>Модель: {editingProduct.productModel || '—'}</p>
+                      <p>Категория: {editingProduct.categoryName}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Редактируемые поля (для добавления и редактирования) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Цена (Br) *</label>
                   <input
@@ -357,28 +393,6 @@ const ProductsManagement = () => {
                     onChange={(e) => setFormData({...formData, quantity: e.target.value})}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
                     required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Бренд</label>
-                  <input
-                    type="text"
-                    value={formData.brand}
-                    onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
-                    disabled={editingProduct}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Модель</label>
-                  <input
-                    type="text"
-                    value={formData.model}
-                    onChange={(e) => setFormData({...formData, model: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B39CD0] focus:border-transparent"
-                    disabled={editingProduct}
                   />
                 </div>
 
